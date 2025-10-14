@@ -1,0 +1,25 @@
+# General
+*.swp
+
+# Chisel
+generated/*
+project/*
+!/project/build.properties
+!/project/plugins.sbt
+target/*
+
+# Visual Studio
+.vscode
+.metals
+.bloop
+.bsp
+
+# Repo specific
+*.rpt
+generated/*.rpt
+generated/verilogCoverage/
+generated/synTestCases/
+generated/scalaCoverage/
+generated/scalaCoverage/
+generated/scalaCoverage/scoverage-report
+
