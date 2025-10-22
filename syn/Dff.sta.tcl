@@ -1,4 +1,4 @@
-set top "DynamicFifo"
+set top "Dff"
 
 read_liberty ../../../syn/stdcells.lib
 read_verilog $top\_net.v

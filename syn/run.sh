@@ -1,16 +1,13 @@
 #!/bin/bash
 
 nand2Area=0.798 # Nangate 45nm
-designName="DynamicFifo"
+designName="Dff"
 
 # Loop through all the test cases
 declare -a arr=(\
-  "small_false_8_8" \
-  "medium_false_32_64" \
-  "large_false_64_256" \
-  "small_true_64_256" \
-  "medium_true_128_128" \
-  "large_true_256_2048"\
+  "small_1" \
+  "medium_64" \
+  "large_128"\
   )
 
 # Synthesize each of the test cases

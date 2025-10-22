@@ -31,6 +31,7 @@ lazy val root = (project in file("."))
   )
 
 // Scala coverage settings
+coverageExcludedPackages := "org.chiselware.dff.*Utils*"
 coverageDataDir := target.value / "../generated/scalaCoverage"
 coverageFailOnMinimum := true
 coverageMinimumStmtTotal := 90

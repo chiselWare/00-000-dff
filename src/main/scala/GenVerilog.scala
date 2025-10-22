@@ -18,9 +18,9 @@ object GenVerilog extends App {
     * configuration and the value is a Vector of parameters.
     */
   val config = Map(
-    "small" -> Vector(1),
-    "medium" -> Vector(32),
-    "large" -> Vector(1024)
+    "small_1" -> Vector(1),
+    "medium_64" -> Vector(64),
+    "large_128" -> Vector(128)
   )
 
   // Iterate through the configuration map and generate Verilog for each

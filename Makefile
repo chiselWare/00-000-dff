@@ -30,7 +30,7 @@ clean:
 # Publish the documentation (locally)
 publish: 
 	@echo Publishing local
-	rm -rf /home/tws/.ivy2/local/tech.rocksavage/dynamicfifo_2.13
+	rm -rf /home/tws/.ivy2/local/org.chiselware/dff_2.13
 	$(SBT) "publishLocal" | tee doc/publish.rpt
 
 # Generate the documentation
@@ -49,7 +49,7 @@ docs:
 verilog:
 	@echo Generate Verilog for synthesis
 	mkdir -p generated
-	$(SBT) "runMain tech.rocksavage.chiselware.dynamicfifo.GenVerilog" | tee generated/verilog.rpt
+	$(SBT) "runMain org.chiselware.dff.GenVerilog" | tee generated/verilog.rpt
 	rm *.anno.json    
 
 # Run the tests
@@ -66,8 +66,8 @@ cov:
 	$(SBT) clean \
 	coverageOn \
 	test \
-	"runMain tech.rocksavage.chiselware.dynamicfifo.GenVerilog" \
-	"runMain tech.rocksavage.chiselware.dynamicfifo.Main" \
+	"runMain org.chiselware.dff.GenVerilog" \
+	"runMain org.chiselware.dff.Main" \
 	coverageReport | tee generated/test.rpt
 	google-chrome --new-window generated/scalaCoverage/scoverage-report/index.html &
 
