@@ -1,5 +1,5 @@
-// (c) 2025 Rocksavage Technology, Inc.
-// This code is licensed under the Apache Software License 2.0 (see LICENSE.MD)
+// (c) <year> <your name or company>
+// This code is licensed under the <name of license> (see LICENSE.MD)
 
 package org.chiselware.dff
 
@@ -30,9 +30,10 @@ object GenVerilog extends App {
       width = thisWidth
     )
 
+    println()
     println(
-      s"Generating Verilog config: $testName\t" +
-        s"width = $thisWidth"
+      s"Generating Verilog config: $testName " +
+        s"(width = $thisWidth)"
     )
 
     // Generate basic Verilog (suppress SV features with lowering, etc)
@@ -46,5 +47,6 @@ object GenVerilog extends App {
         s"-o=generated/synTestCases/$testName"
       )
     )
+    GenSdcFile.run(myParams, s"./generated/synTestCases/$testName")
   }
 }

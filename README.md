@@ -4,7 +4,8 @@ A D-flip-flop.
 
 ## Description
 
-The Dff is a parameterized D-flip-flop.
+The Dff is a parameterized D-flip-flop. This is a toy example that can be 
+used as a template for serious designs.
 
 ## Getting Started
 

@@ -1,7 +1,7 @@
 // (c) 2024 Rocksavage Technology, Inc.
 // This code is licensed under the Apache Software License 2.0 (see LICENSE.MD)
 
-package tech.rocksavage.chiselware.dynamicfifo
+package org.chiselWare.dff
 
 import chisel3._
 import scala.util.Random
@@ -37,20 +37,20 @@ object TestUtils {
     *   whether the coverage passed or failed
     */
   def checkCoverage(coverage: Map[String, Long], file: String): Boolean = {
-    val cov            = new File(file)
-    val covFile        = new PrintWriter(cov)
-    val numTicks       = coverage("dut.tick")
-    val netCoverage    = coverage.view.filterKeys(_ != "dut.tick").toMap
+    val cov = new File(file)
+    val covFile = new PrintWriter(cov)
+    val numTicks = coverage("dut.tick")
+    val netCoverage = coverage.view.filterKeys(_ != "dut.tick").toMap
     val sortedCoverage = ListMap(netCoverage.toSeq.sortBy(_._1): _*).toMap
-    var stuckAtOne     = false
-    var stuckAtZero    = false
-    val separator      = "-" * 80
+    var stuckAtOne = false
+    var stuckAtZero = false
+    val separator = "-" * 80
     covFile.write(separator + "\n")
     covFile.write("%\t\t\t\t\t\t\t\t\tCount\t\t\t\tCoverage Point \n")
     covFile.write(separator + "\n")
     sortedCoverage.keys.foreach((coverPoint) => {
       val toggleCount = sortedCoverage(coverPoint)
-      val togglePct   = toggleCount.toDouble / numTicks * 100
+      val togglePct = toggleCount.toDouble / numTicks * 100
       covFile.write(
         f"${togglePct}%1.2f\t\t\t\t\t ${toggleCount}%8s\t\t\t\t${coverPoint}\n"
       )
@@ -102,9 +102,9 @@ object TestUtils {
     // format: on
     def getHexString(x: Int): String = {
       val hexStringRem0 = "0123456789abcdef" // no extra bits
-      val hexStringRem1 = "01"               // one extra bit
-      val hexStringRem2 = "0123"             // two extra bits
-      val hexStringRem3 = "01234567"         // three extra bits
+      val hexStringRem1 = "01" // one extra bit
+      val hexStringRem2 = "0123" // two extra bits
+      val hexStringRem3 = "01234567" // three extra bits
       return x match {
         case 0 => hexStringRem0
         case 1 => hexStringRem1
@@ -119,7 +119,7 @@ object TestUtils {
       else { return 1 }
     }
 
-    val numNibbles      = width / 4
+    val numNibbles = width / 4
     val numLeftOverBits = width % 4
 
     // format: off
@@ -133,7 +133,7 @@ object TestUtils {
       */
       // format: on
 
-    val randFullNibble    = getHexString(0)
+    val randFullNibble = getHexString(0)
     val randPartialNibble = getHexString(numLeftOverBits)
 
     // format: off
