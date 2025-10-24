@@ -41,7 +41,7 @@ class Dff(p: DffParams) extends Module {
 }
 
 //Generate Verilog and SDC files for regression testing
-object GenVer extends App {
+object GenVerilog extends App {
   DffParams.synConfigMap.foreach { case (configName, configParams) =>
     println()
     println(s"Generating Verilog for config: $configName")
@@ -55,6 +55,6 @@ object GenVer extends App {
         s"-o=generated/synTestCases/$configName"
       )
     )
-    GenSdcFile.run(configParams, s"./generated/synTestCases/$configName")
+    sdcFile.create(configParams, s"./generated/synTestCases/$configName")
   }
 }

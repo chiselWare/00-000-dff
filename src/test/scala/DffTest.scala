@@ -53,30 +53,31 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
     )
 
     it should "perform these tests successfully " in {
-      test(new DffTb(p)) { dut =>
-        dut.clock.setTimeout(0)
-        // Initialize the inputs
-        dut.io.enable.poke(false.B)
-        dut.io.in.poke(0.U)
+      test(new DffTb(p))
+        .withAnnotations(backendAnnotations) { dut =>
+          dut.clock.setTimeout(0)
+          // Initialize the inputs
+          dut.io.enable.poke(false.B)
+          dut.io.in.poke(0.U)
 
-        // Sequence: reset, loop: load, hold
-        info("Reset to zero")
-        dut.reset.poke(true.B)
-        dut.clock.step()
-        dut.reset.poke(false.B)
-        dut.io.out.expect(0.U)
-        info("Test with random data")
-        for (i <- 1 to 10) {
-          val myData = randData(p.width)
-          dut.io.enable.poke(1.U)
-          dut.io.in.poke(myData)
+          // Sequence: reset, loop: load, hold
+          info("Reset to zero")
+          dut.reset.poke(true.B)
           dut.clock.step()
-          dut.io.out.expect(myData)
-          dut.io.enable.poke(0.U)
-          dut.clock.step()
-          dut.io.out.expect(myData)
+          dut.reset.poke(false.B)
+          dut.io.out.expect(0.U)
+          info("Test with random data")
+          for (i <- 1 to 10) {
+            val myData = randData(p.width)
+            dut.io.enable.poke(1.U)
+            dut.io.in.poke(myData)
+            dut.clock.step()
+            dut.io.out.expect(myData)
+            dut.io.enable.poke(0.U)
+            dut.clock.step()
+            dut.io.out.expect(myData)
+          }
         }
-      }
     }
   }
 }

@@ -67,7 +67,6 @@ cov:
 	coverageOn \
 	test \
 	"runMain org.chiselware.dff.GenVerilog" \
-	"runMain org.chiselware.dff.Main" \
 	coverageReport | tee generated/test.rpt
 	google-chrome --new-window generated/scalaCoverage/scoverage-report/index.html &
 

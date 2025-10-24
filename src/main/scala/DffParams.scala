@@ -6,6 +6,7 @@ package org.chiselware.dff
 import chisel3._
 import chisel3.util._
 import scala.collection.mutable.LinkedHashMap
+import java.io.{File, PrintWriter}
 
 /** Default parameter settings for Dff
   *
@@ -44,8 +45,44 @@ object DffParams {
   )
 
   val synConfigMap = LinkedHashMap[String, DffParams](
-    "config_1" -> DffParams(width = 1),
-    "config_64" -> DffParams(width = 64),
-    "config_128" -> DffParams(width = 128)
+    "small_1" -> DffParams(width = 1),
+    "medium_64" -> DffParams(width = 64),
+    "large_128" -> DffParams(width = 128)
   )
+}
+
+/** Customize this companion object with your port list and desired synthesis
+  * contraints.
+  */
+
+object sdcFile {
+  def create(p: DffParams, sdcFilePath: String): Unit = {
+    // Default constraints, tighten or loosen as necessary
+    val period = 5.000 // ns
+    val dutyCycle = 0.50
+    val inputDelayPct = 0.2
+    val outputDelayPct = 0.2
+
+    // Calculated constraints, override as needed in SdcFileData
+    val inputDelay = period * inputDelayPct
+    val outputDelay = period * outputDelayPct
+    val fallingEdge = period * dutyCycle
+
+    //
+    val sdcFileData = s"""
+    |create_clock -period $period -waveform {0 $fallingEdge} clock
+    |set_input_delay -clock clock $inputDelay {reset}
+    |set_input_delay -clock clock $inputDelay {io_d}
+    |set_input_delay -clock clock $inputDelay {io_enable}
+    |set_output_delay -clock clock $outputDelay {io_q}
+  """.stripMargin.trim
+
+    println(s"Writing SDC file to $sdcFilePath")
+    val sdcFileDir = new File(sdcFilePath)
+    sdcFileDir.mkdirs()
+    val sdcFileName = new File(s"$sdcFilePath/Dff.sdc")
+    val sdcFile = new PrintWriter(sdcFileName)
+    sdcFile.write(s"${sdcFileData}")
+    sdcFile.close()
+  }
 }
