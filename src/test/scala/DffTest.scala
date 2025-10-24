@@ -12,10 +12,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.Assertions._
 import firrtl2.options.TargetDirAnnotation
 import scala.util.Random
-import scala.math.pow
-import java.io.{File, FileWriter, PrintWriter, BufferedWriter}
-import org.chiselWare.dff.TestUtils.{randData}
-import scala.collection.mutable.LinkedHashMap
+import java.io.{File}
 
 class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
 
@@ -68,7 +65,7 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
           dut.io.out.expect(0.U)
           info("Test with random data")
           for (i <- 1 to 10) {
-            val myData = randData(p.width)
+            val myData = BigInt(p.width, scala.util.Random)
             dut.io.enable.poke(1.U)
             dut.io.in.poke(myData)
             dut.clock.step()
