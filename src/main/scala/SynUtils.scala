@@ -48,7 +48,6 @@ import java.io.{File, PrintWriter}
   * @param sdcFilePath
   *   Path to where the .sdc file will be written
   */
-
 object GenSdcFile {
   def run(p: DffParams, sdcFilePath: String): Unit = {
     // Default constraints, tighten or loosen as necessary
@@ -63,12 +62,12 @@ object GenSdcFile {
     val fallingEdge = period * dutyCycle
 
     val sdcFileData = s"""
-    create_clock -period $period -waveform {0 $fallingEdge} clock
-    set_input_delay -clock clock $inputDelay {reset}
-    set_input_delay -clock clock $inputDelay {io_d}
-    set_input_delay -clock clock $inputDelay {io_enable}
-    set_output_delay -clock clock $outputDelay {io_q}
-  """.stripMargin
+    |create_clock -period $period -waveform {0 $fallingEdge} clock
+    |set_input_delay -clock clock $inputDelay {reset}
+    |set_input_delay -clock clock $inputDelay {io_d}
+    |set_input_delay -clock clock $inputDelay {io_enable}
+    |set_output_delay -clock clock $outputDelay {io_q}
+  """.stripMargin.trim
 
     println(s"Writing SDC file to $sdcFilePath")
     val sdcFileDir = new File(sdcFilePath)

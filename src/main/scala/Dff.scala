@@ -38,47 +38,23 @@ class Dff(p: DffParams) extends Module {
   }
 
   io.q := q
-
-  /** Pin-level coverage analysis. Each input and output pin is checked to see
-    * if they toggle during simulation. This is like a pin-level code coverage.
-    *
-    * The tick value is used later to count the number clock ticks used to
-    * calculate the coverage percentage.
-    *
-    * When coverage is enabled, the generated Verilog is annotated with coverage
-    * points for all the ports in the IO Bundle.
-    *
-    * The code below does this automatically for every port in the IO Bundle.
-    */
-
-  if (p.coverage) {
-    val tick = true.B
-    val collectPorts: Seq[(String, Bool)] = SimUtils
-      .flatten(io, "io_")
-      .map { case (name, b) =>
-        name -> (b.asUInt)(0)
-      }
-    cover(tick).suggestName("tick")
-    collectPorts.foreach { case (name, bit) =>
-      cover(bit).suggestName(s"$name")
-    }
-  }
-
 }
 
-/** Generate Verilog and its associated SDC file */
-object Main extends App {
-  val myParams = DffParams(width = 8, coverage = true)
-  ChiselStage.emitSystemVerilog(
-    new Dff(myParams),
-    firtoolOpts = Array(
-      "--lowering-options=disallowLocalVariables,disallowPackedArrays",
-      "--disable-all-randomization",
-      "--strip-debug-info",
-      "--verilog",
-      "--split-verilog",
-      "-o=generated"
+//Generate Verilog and SDC files for regression testing
+object GenVer extends App {
+  DffParams.synConfigMap.foreach { case (configName, configParams) =>
+    println()
+    println(s"Generating Verilog for config: $configName")
+    ChiselStage.emitSystemVerilog(
+      new Dff(configParams),
+      firtoolOpts = Array(
+        "--lowering-options=disallowLocalVariables,disallowPackedArrays",
+        "--disable-all-randomization",
+        "--strip-debug-info",
+        "--split-verilog",
+        s"-o=generated/synTestCases/$configName"
+      )
     )
-  )
-  GenSdcFile.run(myParams, "./generated/syn")
+    GenSdcFile.run(configParams, s"./generated/synTestCases/$configName")
+  }
 }

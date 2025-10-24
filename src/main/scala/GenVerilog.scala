@@ -7,46 +7,24 @@ import chisel3._
 import chisel3.util._
 import _root_.circt.stage.ChiselStage
 
-/** Generate Verilog for different configurations of the core all at once. This
-  * is useful for generating different test cases for synthesis tools.
+/** Generate different Verilog cores for generating synthesis regression tests.
   */
 
 object GenVerilog extends App {
 
-  /** Create a map of Vectors to specify the different configurations to
-    * generate in a comma-separated value format. The key is the name of the
-    * configuration and the value is a Vector of parameters.
-    */
-  val config = Map(
-    "small_1" -> Vector(1),
-    "medium_64" -> Vector(64),
-    "large_128" -> Vector(128)
-  )
-
-  // Iterate through the configuration map and generate Verilog for each
-  config.foreach { case (testName, paramVec) =>
-    val thisWidth = paramVec(0).asInstanceOf[Int]
-    val myParams = DffParams(
-      width = thisWidth
-    )
-
+  DffParams.synConfigMap.foreach { case (configName, configParams) =>
     println()
-    println(
-      s"Generating Verilog config: $testName " +
-        s"(width = $thisWidth)"
-    )
-
-    // Generate basic Verilog (suppress SV features with lowering, etc)
+    println(s"Generating Verilog for config: $configName")
     ChiselStage.emitSystemVerilog(
-      new Dff(myParams),
+      new Dff(configParams),
       firtoolOpts = Array(
         "--lowering-options=disallowLocalVariables,disallowPackedArrays",
         "--disable-all-randomization",
         "--strip-debug-info",
         "--split-verilog",
-        s"-o=generated/synTestCases/$testName"
+        s"-o=generated/synTestCases/$configName"
       )
     )
-    GenSdcFile.run(myParams, s"./generated/synTestCases/$testName")
+    GenSdcFile.run(configParams, s"./generated/synTestCases/$configName")
   }
 }
