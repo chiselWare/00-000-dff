@@ -1,7 +1,8 @@
 MAKEFLAGS += --silent
 	
 SBT = sbt
-	
+SHELL := /bin/bash
+
 # Run everything and scan for errors
 list:
 	@grep '^[^#[:space:]].*:' Makefile
@@ -11,14 +12,15 @@ all: clean publish docs cov yosys check
 check: 
 	@echo 
 	@echo Checking for errors
-	grep error */*.rpt */*/*/*.rpt */*/*/*.log | tee error.rpt
-	grep Error */*.rpt */*/*/*.rpt */*/*/*.log | tee -a error.rpt
-	grep fail */*.rpt */*/*/*.rpt */*/*/*.log | grep -v "failed 0" | tee -a error.rpt
+	grep error */*.rpt */*/*.rpt */*/*/*.rpt */*/*/*.log | tee ./generated/error.rpt
+	grep Error */*.rpt */*/*.rpt */*/*/*.rpt */*/*/*.log | tee ./generated/error.rpt
+	grep fail */*.rpt */*/*.rpt */*/*/*.rpt  */*/*/*.log | grep -v "failed 0" | tee ./generated/error.rpt
 	@echo; 
-	if [ ! -s error.rpt ]; \
-	then echo "\e[1;32mALL TESTS PASSED WITH NO ERRORS \e[0m"; \
-	else echo "\e[1;31mTESTS COMPLETED WITH ERRORS \e[0m"; \
-	fi; 
+	@if [ ! -s error.rpt ]; then \
+		printf "\033[1;32mALL TESTS PASSED WITH NO ERRORS \033[0m\n"; \
+	else \
+		printf "\033[1;31mTESTS COMPLETED WITH ERRORS \033[0m\n"; \
+	fi
 	@echo
 
 # Start with a fresh directory
@@ -73,4 +75,5 @@ cov:
 # Run synthesis on generated Verilog; generate timing and area reports
 yosys:
 	make verilog    
-	cd syn && ./run.sh
+	cd generated/synTestCases && source run.sh
+

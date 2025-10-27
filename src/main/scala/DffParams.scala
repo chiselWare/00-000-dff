@@ -63,19 +63,18 @@ object sdcFile {
     val inputDelayPct = 0.2
     val outputDelayPct = 0.2
 
-    // Calculated constraints, override as needed in SdcFileData
+    // Calculated constraints, customize as needed in SdcFileData
     val inputDelay = period * inputDelayPct
     val outputDelay = period * outputDelayPct
     val fallingEdge = period * dutyCycle
 
-    //
     val sdcFileData = s"""
-    |create_clock -period $period -waveform {0 $fallingEdge} clock
-    |set_input_delay -clock clock $inputDelay {reset}
-    |set_input_delay -clock clock $inputDelay {io_d}
-    |set_input_delay -clock clock $inputDelay {io_enable}
-    |set_output_delay -clock clock $outputDelay {io_q}
-  """.stripMargin.trim
+      |create_clock -period $period -waveform {0 $fallingEdge} clock
+      |set_input_delay -clock clock $inputDelay {reset}
+      |set_input_delay -clock clock $inputDelay {io_d}
+      |set_input_delay -clock clock $inputDelay {io_enable}
+      |set_output_delay -clock clock $outputDelay {io_q}
+    """.stripMargin.trim
 
     println(s"Writing SDC file to $sdcFilePath")
     val sdcFileDir = new File(sdcFilePath)
