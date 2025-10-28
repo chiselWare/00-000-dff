@@ -99,18 +99,13 @@ object staTclFile {
 object runScriptFile {
   def create(
       mainClassName: String,
-      configName: String,
-      synTestCaseDir: String
+      configs: String
   ): Unit = {
     val nand2Area = 0.798 // Nangate 45nm
 
-    val bashConfigs = DffParams.synConfigMap
-      .map { case (configName, config) => s"$configName" }
-      .mkString(" ")
-
     val runScriptFileData = s"""
       |#!/bin/bash
-      |declare -a arr=(${bashConfigs})
+      |declare -a arr=(${configs})
       |
       |# Synthesize each of the test cases
       |for testCase in "$${arr[@]}"

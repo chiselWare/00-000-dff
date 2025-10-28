@@ -2,15 +2,12 @@ MAKEFLAGS += --silent
 	
 SBT = sbt
 SHELL := /bin/bash
-BUILD := generated/synTestCases
 
 # Run everything and scan for errors
 list:
 	@grep '^[^#[:space:]].*:' Makefile
 
 all: clean publish docs cov yosys check
-
-.PHONY: check
 
 check: 
 	@echo 

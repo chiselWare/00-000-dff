@@ -65,8 +65,7 @@ object Main extends App {
     utils.staTclFile.create("Dff", s"./generated/synTestCases/$configName")
     utils.runScriptFile.create(
       "Dff",
-      configName,
-      s"./generated/synTestCases/$configName"
+      DffParams.synConfigs
     )
   }
 }

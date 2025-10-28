@@ -49,6 +49,11 @@ object DffParams {
     "medium_64" -> DffParams(width = 64),
     "large_128" -> DffParams(width = 128)
   )
+
+  // Extract config names into a space-separated string
+  val synConfigs = DffParams.synConfigMap
+    .map { case (configName) => s"$configName" }
+    .mkString(" ")
 }
 
 /** Customize this companion object with your port list and desired synthesis
