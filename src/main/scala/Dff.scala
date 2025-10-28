@@ -41,12 +41,10 @@ class Dff(p: DffParams) extends Module {
   io.q := q
 }
 
-/** Generate test cases for each configuration to be used as part of the
-  * regression framework. Customize with your design info.
+/** Generate Verilog and related collateral for each configuration to be used as
+  * part of the regression framework.
   */
-
-// Generate Verilog
-object GenVerilog extends App {
+object Main extends App {
   DffParams.synConfigMap.foreach { case (configName, configParams) =>
     println()
     println(s"Generating Verilog for config: $configName")

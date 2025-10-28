@@ -2,6 +2,7 @@ MAKEFLAGS += --silent
 	
 SBT = sbt
 SHELL := /bin/bash
+BUILD := generated/synTestCases
 
 # Run everything and scan for errors
 list:
@@ -9,19 +10,20 @@ list:
 
 all: clean publish docs cov yosys check
 
+.PHONY: check
+
 check: 
 	@echo 
 	@echo Checking for errors
+	rm -rf ./generated.error.rpt
 	grep error */*.rpt */*/*.rpt */*/*/*.rpt */*/*/*.log | tee ./generated/error.rpt
-	grep Error */*.rpt */*/*.rpt */*/*/*.rpt */*/*/*.log | tee ./generated/error.rpt
-	grep fail */*.rpt */*/*.rpt */*/*/*.rpt  */*/*/*.log | grep -v "failed 0" | tee ./generated/error.rpt
-	@echo; 
-	@if [ ! -s error.rpt ]; then \
-		printf "\033[1;32mALL TESTS PASSED WITH NO ERRORS \033[0m\n"; \
+	grep Error */*.rpt */*/*.rpt */*/*/*.rpt */*/*/*.log | tee -a ./generated/error.rpt
+	grep fail */*.rpt */*/*.rpt */*/*/*.rpt  */*/*/*.log | grep -v "failed 0" | tee -a ./generated/error.rpt
+	@if [ ! -s ./generated/error.rpt ]; then \
+	  printf "\033[1;32mALL TESTS PASSED WITH NO ERRORS\033[0m\n" ;\
 	else \
-		printf "\033[1;31mTESTS COMPLETED WITH ERRORS \033[0m\n"; \
+	  printf "\033[1;31mTESTS COMPLETED WITH ERRORS\033[0m\n" ;\
 	fi
-	@echo
 
 # Start with a fresh directory
 clean: 
@@ -51,7 +53,7 @@ docs:
 verilog:
 	@echo Generate Verilog for synthesis
 	mkdir -p generated
-	$(SBT) "runMain org.chiselware.dff.GenVerilog" | tee generated/verilog.rpt
+	$(SBT) "runMain org.chiselware.dff.Main" | tee generated/verilog.rpt
 	rm *.anno.json    
 
 # Run the tests
@@ -68,12 +70,12 @@ cov:
 	$(SBT) clean \
 	coverageOn \
 	test \
-	"runMain org.chiselware.dff.GenVerilog" \
+	"runMain org.chiselware.dff.Main" \
 	coverageReport | tee generated/test.rpt
 	google-chrome --new-window generated/scalaCoverage/scoverage-report/index.html &
 
 # Run synthesis on generated Verilog; generate timing and area reports
-yosys:
+yosys: 
 	make verilog    
 	cd generated/synTestCases && source run.sh
 

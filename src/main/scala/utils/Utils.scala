@@ -142,7 +142,7 @@ object runScriptFile {
     """.stripMargin.trim
 
     println(
-      s"Writing script to run static timing analysis on configurations of $mainClassName"
+      s"Writing script to run static timing analysis on this configuration of $mainClassName"
     )
     val runScriptFileName = new File(s"./generated/synTestCases/run.sh")
     val runScriptFile = new PrintWriter(runScriptFileName)
