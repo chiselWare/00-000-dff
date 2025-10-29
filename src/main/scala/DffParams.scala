@@ -52,7 +52,7 @@ object DffParams {
 
   // Extract config names into a space-separated string
   val synConfigs = DffParams.synConfigMap
-    .map { case (configName) => s"$configName" }
+    .map { case (configName, config) => s"$configName" }
     .mkString(" ")
 }
 

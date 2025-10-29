@@ -18,8 +18,7 @@ import org.chiselware.dff._
   * ```
   * 1. yosysTclFile generates a synthesis script for each configuration
   * 2. staTclFile generates a STA script for each configuration
-  * 3. sdcFile generates a script for each configuration
-  * 4. runScriptFile generates a bash script for running synthesis and STA
+  * 3. runScriptFile generates a bash script for running synthesis and STA
   *
   * Structure is as follows:
   *    generated/synTestCases/
