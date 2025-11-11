@@ -10,7 +10,7 @@ used as a template for serious designs.
 ## Getting Started
 
 It is recommended that the user reads the Dff Users Guide which can be 
-found in the ```./doc/user-guide``` directory.
+found in the ```.modules/dff/docs/user-guide``` directory.
 
 ### Dependencies
 
@@ -33,11 +33,12 @@ found in the main class file (Dff.scala) and executed as follows:
 
 ```
 $ sbt
-sbt:dff>
-sbt:dff> runMain org.chiselware.dff.Main
+sbt:chiselware>
+sbt:chiselware> project core
+sbt:chiselware-core-dff> run
 ```
 
-The RTL will be generated in the ```./generated``` directory.
+The RTL will be generated in the ```./modules/dff/generated``` directory.
 
 ### Running a Simulation  
 
@@ -52,18 +53,20 @@ as follows:
 
 ```
 $ sbt
-sbt:dff>
-sbt:dff> test
+sbt:chiselware>
+sbt:chiselware> project core
+sbt:chiselware-core-dff> test
 ```
 
 ### Synthesis
 
 Dff is a DFT-clean, fully synthesizable core. 
 
-A ```.sdc``` file is generated together with the RTL code.  Synthesis scripts 
-for Yosys are included in the ```./syn``` directory and can be easily ported to 
-commercial synthesis tools. Static timing analysis is also performed using 
-OpenSTA.
+A ```.sdc``` file is generated together with the RTL code for each configuration
+in the ```./modules/dff/generated/synTestCases/ directory.```  Synthesis scripts 
+for the synthesis tool Yosys and timing analysis scripts for the OpenSTA static
+timing analysis tool are included in the same directory and can be easily ported 
+to commercial synthesis tools.
 
 Included also is the Nangate 45nm technology library to allow users to run
 included synthesis regressions out-of-the-box and later change to their 
@@ -76,9 +79,9 @@ Warren Savage
 
 ## Version History
 
-* 0.1
+* 0.1.0
     * Initial Release with full functionality
 
 ## License
 
-See the [LICENSE.MD](https://github.com/rocksavagetech/dynamicfifo/blob/main/LICENSE.MD) file for license rights and limitations (Apache2).
+See the [LICENSE.MD](https://github.com/chiselWare/dff/blob/main/LICENSE.MD) file for license rights and limitations (Apache2).
