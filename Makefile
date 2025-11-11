@@ -2,77 +2,117 @@ MAKEFLAGS += --silent
 	
 SBT = sbt
 SHELL := /bin/bash
+CORE_DIR := "modules/dff"
+GEN_DIR := "${CORE_DIR}/generated"
+ERROR_REP := "${GEN_DIR}/error.rpt"
+TC_DIR := "${GEN_DIR}/synTestCases"
+CORE := "Dff"
 
 # Run everything and scan for errors
+.PHONY: list
 list:
 	@grep '^[^#[:space:]].*:' Makefile
 
-all: clean publish docs cov yosys check
+.PHONY: all
+all: clean docs cov yosys check
 
+.PHONY: check
 check: 
 	@echo 
 	@echo Checking for errors
-	rm -rf ./generated.error.rpt
-	grep error */*.rpt */*/*.rpt */*/*/*.rpt */*/*/*.log | tee ./generated/error.rpt
-	grep Error */*.rpt */*/*.rpt */*/*/*.rpt */*/*/*.log | tee -a ./generated/error.rpt
-	grep fail */*.rpt */*/*.rpt */*/*/*.rpt  */*/*/*.log | grep -v "failed 0" | tee -a ./generated/error.rpt
-	@if [ ! -s ./generated/error.rpt ]; then \
+	rm -rf ${CORE_DIR}/generated/error.rpt
+# root
+	grep -Hn -E "Error|error" docs/doc.rpt | tee -a ${ERROR_REP}
+# core docs
+	grep -Hn -E "Error|error" ${CORE_DIR}/docs/doc.rpt | tee -a ${ERROR_REP} 
+# test and verilog reports
+	grep -Hn -E "Error|error" ${GEN_DIR}/verilog.rpt | tee -a ${ERROR_REP} 
+	grep -Hn -E "Error|error" ${GEN_DIR}/test.rpt | tee -a ${ERROR_REP} 
+	grep -Hn -E "fail" ${GEN_DIR}/test.rpt | grep -v "failed 0" | tee -a ${ERROR_REP} 
+# summary reports
+	grep -Hn -E "Error|error" ${TC_DIR}/area_summary.rpt | tee -a ${ERROR_REP} 
+	grep -Hn -E "Error|error" ${TC_DIR}/timing_summary.rpt | tee -a ${ERROR_REP} 
+# synTestCases
+	grep -Hn -E "Error|error" ${TC_DIR}/*/timing.rpt | tee -a ${ERROR_REP} 
+	grep -Hn -E "Error|error" ${TC_DIR}/*/yosys.log | tee -a ${ERROR_REP} 
+# check for errors
+	@if [ ! -s ${CORE_DIR}/generated/error.rpt ]; then \
 	  printf "\033[1;32mALL TESTS PASSED WITH NO ERRORS\033[0m\n" ;\
 	else \
 	  printf "\033[1;31mTESTS COMPLETED WITH ERRORS\033[0m\n" ;\
 	fi
 
 # Start with a fresh directory
+.PHONY: clean
 clean: 
 	@echo Cleaning
-	rm -rf generated target *anno.json ./*.rpt doc/*.rpt syn/*.rpt syn.log
-	rm -rf project/build.properties project/project project/target
+	rm -rf docs/*.rpt
+	rm -rf target
+	rm -rf project/target
+	rm -rf project/project 
+	rm -rf ${CORE_DIR}/docs/*.rpt
+	rm -rf ${CORE_DIR}/generated 
+	rm -rf ${CORE_DIR}/target 
+	rm -rf ${CORE_DIR}/project/project 
+	rm -rf ${CORE_DIR}/project/target
 
-# Publish the documentation (locally)
+.PHONY: publish
 publish: 
-	@echo Publishing local
-	rm -rf /home/tws/.ivy2/local/org.chiselware/dff_2.13
-	$(SBT) "publishLocal" | tee doc/publish.rpt
+	@echo Publishing libraries locally
+	rm -rf /home/tws/.ivy2/local/org.chiselware/chiselware-syn_2.13
+	$(SBT) "project core" publishLocal | tee docs/publish.rpt
 
 # Generate the documentation
+.PHONY: docs
 docs:
-	@echo Generating docs
-	$(SBT) "doc" | tee doc/doc.rpt
-#	google-chrome --new-window ./target/scala-2.13/api/index.html & 
-	cd doc/user-guide && pdflatex DynamicFifo.tex | tee -a ../doc.rpt
+	@echo Building API docs
+	$(SBT) "project core" doc | tee docs/doc.rpt
+	google-chrome --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o01/t001/dff/index.html
+	@echo Building User Guide
+	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex 
 # Rerun to generate TOC
-	cd doc/user-guide && pdflatex DynamicFifo.tex | tee -a ../doc.rpt
+	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex | tee -a ../doc.rpt 
 # Clean up temp files
-	cd doc/user-guide && rm *.aux *.toc *.out *.log
-#	google-chrome --new-window doc/user-guide/DynamicFifo.pdf & 
+	cd ${CORE_DIR}/docs/user-guide && rm *.aux *.toc *.out *.log 
+	google-chrome ${CORE_DIR}/docs/user-guide/${CORE}.pdf & 
 
 # Generate Verilog and synthesize
+.PHONY: verilog
 verilog:
 	@echo Generate Verilog for synthesis
-	mkdir -p generated
-	$(SBT) "runMain org.chiselware.dff.Main" | tee generated/verilog.rpt
-	rm *.anno.json    
+	mkdir -p ${CORE_DIR}/generated
+	$(SBT) "project core" run | tee ${CORE_DIR}/generated/verilog.rpt
+	rm -rf *anno.json
 
 # Run the tests
+.PHONY: test
 test:
 	@echo Running tests
-	mkdir -p generated
-	$(SBT) "test" | tee generated/test.rpt
+	mkdir -p ${CORE_DIR}/generated
+	$(SBT) "project core" test | tee ${CORE_DIR}/generated/test.rpt
+	rm -rf *anno.json
 
 # Run the tests with Scala code coverage enables
+.PHONY: cov
 cov:
 	@echo Running tests with coverage enabled
-	mkdir -p generated
-	mkdir -p generated/scalaCoverage
+	mkdir -p ${CORE_DIR}/generated
 	$(SBT) clean \
 	coverageOn \
+	"project core" \
 	test \
-	"runMain org.chiselware.dff.Main" \
-	coverageReport | tee generated/test.rpt
-	google-chrome --new-window generated/scalaCoverage/scoverage-report/index.html &
+	run  \
+	coverageReport | tee ${CORE_DIR}/generated/test.rpt
+	rm -rf *.anno.json
+	google-chrome --new-window ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html &
 
 # Run synthesis on generated Verilog; generate timing and area reports
+.PHONY: yosys
 yosys: 
-	make verilog    
-	cd generated/synTestCases && source run.sh
+	make verilog
+	cd ${CORE_DIR}/generated/synTestCases && source run.sh
+	echo "---------------------------------------------------------"
+	echo "                      SUMMARY                            "
+	echo "---------------------------------------------------------"
+	cat ${CORE_DIR}/generated/synTestCases/{area,timing}_summary.rpt
 

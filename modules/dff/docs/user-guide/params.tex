@@ -1,0 +1,39 @@
+% chktex-file 44
+
+\section{Parameter Descriptions}
+
+The parameters for \textbf{Dff} are shown below in
+Table~\ref{table:params}.
+
+\renewcommand*{\arraystretch}{1.4}
+\begin{longtable}[H]{
+    | p{0.25\textwidth}
+    | p{0.10\textwidth}
+    | p{0.05\textwidth}
+    | p{0.05\textwidth}
+    | p{0.40\textwidth} |
+  }
+  \hline
+  \textbf{Name} &
+  \textbf{Type} &
+  \textbf{Min}  &
+  \textbf{Max}  &
+  \textbf{Description}              \\ \hline \hline
+
+  width         &
+  Int           &
+  1             &
+  $\ge$ 1       &
+  The data width of the D flip-flop \\ \hline
+
+  \caption{Parameter Descriptions}\label{table:params}
+\end{longtable}
+
+The Dff is instantiated into a design as follows:
+
+\begin{lstlisting}[language=Scala]
+
+  // Instantiate small register made of flip-flops
+  val myRegister = new Dff(width = 8)
+
+  \end{lstlisting}
