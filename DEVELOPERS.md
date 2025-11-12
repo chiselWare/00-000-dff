@@ -2,7 +2,7 @@
 
 This template contains a template Chisel code to be used for your starting your chiselWare-compliant core. Note that this template also contains code that is part of a harness that chiselWare uses to periodically perform regression testing. It is important that you do not break this when you make your customizations.
 
-**This file (DEVELOPERS.MD) should be removed from your core repository before release**
+**This file (DEVELOPERS.md) should be removed from your core repository before release**
 
 ## Organizationa and Team IDs
 
@@ -47,8 +47,7 @@ a release candidate.
 The directory hierarchy of all chiselWare cores follow this deeply hierarchical
 structure which is consistent with Scala best practices.
 
-Below is an example for the Dff template. Notice the directories ```o00``` and
-```t000```. These should be renamed with your own organization and team IDs.
+Below is an example for the Dff template. Notice the directories ```o01``` and ```t001```. These should be renamed with your own organization and team IDs.
 
 ```
 
