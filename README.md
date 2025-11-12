@@ -79,6 +79,12 @@ Warren Savage
 
 ## Version History
 
+* 0.1.2
+    * Tweaks to DEVELOPERS.md and README.md
+* 0.1.2
+    * Tweaks to DEVELOPERS.md
+* 0.1.1
+    * Add DEVELOPERS.md
 * 0.1.0
     * Initial Release with full functionality
 

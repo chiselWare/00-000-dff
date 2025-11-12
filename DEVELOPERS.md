@@ -10,7 +10,7 @@ chiselWare contributors are organized into organizations and teams, including te
 
 When you request to develop a chiselWare core, you will be given an 2-digit organization ID and a 3-digit team ID. These IDs will show up in the directory 
 structure and package name of your core. You can see the Dff template has a
-organization ID of ```00``` and a team ID of ```000```.
+organization ID of ```01``` and a team ID of ```001```.
 
 ## Root directory modifications
 
