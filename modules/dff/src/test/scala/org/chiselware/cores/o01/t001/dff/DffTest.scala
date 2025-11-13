@@ -1,5 +1,5 @@
-// (c) 2025 Rocksavage Technology, Inc.
-// This code is licensed under the Apache Software License 2.0 (see LICENSE.MD)
+// (c) <year> <your name or company>
+// This code is licensed under the <name of license> (see LICENSE.MD)
 
 package org.chiselware.cores.o01.t001.dff
 
