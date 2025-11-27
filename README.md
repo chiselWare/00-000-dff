@@ -79,6 +79,8 @@ Warren Savage
 
 ## Version History
 
+* 0.1.3
+    * Switch from google-chrome to firefox
 * 0.1.2
     * Tweaks to DEVELOPERS.md and README.md
 * 0.1.2

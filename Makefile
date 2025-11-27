@@ -14,7 +14,7 @@ list:
 	@grep '^[^#[:space:]].*:' Makefile
 
 .PHONY: all
-all: clean docs cov yosys check
+all: clean cov yosys docs check
 
 .PHONY: check
 check: 
@@ -67,14 +67,14 @@ publish:
 docs:
 	@echo Building API docs
 	$(SBT) "project core" doc | tee docs/doc.rpt
-	google-chrome --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o01/t001/dff/index.html
+	firefox --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o01/t001/dff/index.html 2>/dev/null &
 	@echo Building User Guide
 	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex 
 # Rerun to generate TOC
 	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex | tee -a ../doc.rpt 
 # Clean up temp files
 	cd ${CORE_DIR}/docs/user-guide && rm *.aux *.toc *.out *.log 
-	google-chrome ${CORE_DIR}/docs/user-guide/${CORE}.pdf & 
+	firefox ${CORE_DIR}/docs/user-guide/${CORE}.pdf 2>/dev/null & 
 
 # Generate Verilog and synthesize
 .PHONY: verilog
@@ -104,7 +104,7 @@ cov:
 	run  \
 	coverageReport | tee ${CORE_DIR}/generated/test.rpt
 	rm -rf *.anno.json
-	google-chrome --new-window ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html &
+	firefox --new-window ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html 2>/dev/null &
 
 # Run synthesis on generated Verilog; generate timing and area reports
 .PHONY: yosys
