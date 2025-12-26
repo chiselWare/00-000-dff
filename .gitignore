@@ -7,6 +7,7 @@ project/*
 !/project/plugins.sbt
 modules/*/generated/*
 modules/*/target/*
+modules/*/.scala-build/*
 target/*
 
 # Visual Studio
