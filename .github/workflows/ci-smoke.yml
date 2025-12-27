@@ -6,7 +6,7 @@ on:
 
 jobs:
   call-smoke:
-    uses: chiselWare/.github/.github/workflows/_smoke-test.yml@main
+    uses: chiselWare/ci-workflow/.github/workflows/_smoke-test.yml@main
     with:
-      message: "Hello from 00-000-dff calling chiselWare/.github"
+      message: "Hello from 00-000-dff calling chiselWare/ci-workflow"
     secrets: inherit
