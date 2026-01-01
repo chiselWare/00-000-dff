@@ -1,0 +1,13 @@
+name: CI Make Dry Run (calls reusable workflow)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dry-run:
+    uses: chiselWare/ci-workflows/.github/workflows/make-dry-run.yml@v1
+    with:
+      make_target: "all"
+      make_dir: "."
+    secrets: inherit
