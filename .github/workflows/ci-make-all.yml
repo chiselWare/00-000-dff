@@ -1,0 +1,15 @@
+name: CI Make All
+
+on:
+  pull_request:
+    branches: [ staging ]
+  workflow_dispatch:
+
+jobs:
+  make-all:
+    uses: chiselWare/ci-workflows/.github/workflows/make-all.yml@v1
+    with:
+      make_target: "all"
+      make_dir: "."
+      runner_labels: '["self-hosted","local-ci"]'
+    secrets: inherit
