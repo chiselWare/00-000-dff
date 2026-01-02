@@ -12,4 +12,4 @@ jobs:
       module_name: "dff"
       make_target: "all"
       runner_labels: '["self-hosted","local-ci"]'
-t     secrets: inherit
+    secrets: inherit
