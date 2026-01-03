@@ -137,3 +137,59 @@ It should follow the naming convention ```<MainClassNameTb.scala>```.
 ### ./modules/dff/src/test/scala/.../dff/DffTest.scala
 
 This is the main test class that is used to run tests. It follows the naming convention of ````<MainClassNameTest.scala>.
+
+## Branch structure in chiselWare repos
+
+Each chiselWare IP repository uses a simple three-stage branch model:
+
+- **feature/*** branches are for development work. You can create as many feature branches as you like (e.g. feature/my-feature) and push commits freely. Pushing your commit will trigger an automatic CI workflow that executes `make all`.
+- **staging** is the verification gate. A change is considered “ready” only after it has been merged into staging and the required CI checks pass.
+- **main** is the certified branch. It is updated only by promoting already-verified changes from staging. No additional CI is required at this promotion step— `staging → main` is an administrative review and approval gate.
+
+In other words: develop on feature branches, prove correctness on staging, and treat main as the stable, certified snapshot of the repository.
+
+### Developer workflow: feature → staging → main
+
+#### 1. Create a feature branch from main
+
+   - Start from the current certified baseline:
+
+      ```bash
+      git checkout main
+      git pull
+      git checkout -b feature/my-feature
+      ```
+
+   - Make changes and commit normally.
+
+#### 2. Run regressions while you develop
+
+You’re expected to run the project’s regression harness locally (typically via `make all`) as you iterate.
+
+CI is designed to run the same entrypoint, so if it passes locally it should behave similarly in `staging`.
+
+#### 3. Open a pull request from your feature branch into staging
+
+When you believe your feature is ready, open a PR:
+
+```bash
+feature/my-feature → staging
+```
+
+- This PR will run the repository’s required CI workflow (the full regression gate). If the checks fail, review the logs and published artifacts to diagnose the issue, fix it on your feature branch, and push more commits; CI will re-run automatically on new commits.
+
+#### 4. After CI passes, merge into staging
+
+- Once the PR shows all required checks passing, you (or the repository maintainer) may merge it into `staging`.
+- At this point, the change is considered verified.
+
+#### 5. Promotion to `main` is handled by maintainers
+
+The final step is a PR:
+
+staging → main
+
+
+This is a **pure promotion** step—no additional regression is expected here. Maintainers review what’s in `staging` and then promote it into `main` when appropriate. This keeps `main` clean, stable, and certified.
+
+If you’re new to chiselWare: the key idea is that `staging` **is where correctness is proven**, and `main` **is where verified work is published.**
