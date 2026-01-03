@@ -1,4 +1,4 @@
-name: CI Make All
+name: "00-000-dff regression (make all)"
 
 on:
   pull_request:
