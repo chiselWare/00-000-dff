@@ -14,7 +14,7 @@ list:
 	@grep '^[^#[:space:]].*:' Makefile
 
 .PHONY: all
-all: clean cov yosys docs check
+all: clean lint cov yosys docs check
 
 .PHONY: check
 check: 
@@ -23,6 +23,8 @@ check:
 	rm -rf ${CORE_DIR}/generated/error.rpt
 # root
 	grep -Hn -E "Error|error" docs/doc.rpt | tee -a ${ERROR_REP}
+# lint
+	grep -Hn -E "Error|error" lint.rpt | tee -a ${ERROR_REP}
 # core docs
 	grep -Hn -E "Error|error" ${CORE_DIR}/docs/doc.rpt | tee -a ${ERROR_REP} 
 # test and verilog reports
@@ -46,7 +48,8 @@ check:
 .PHONY: clean
 clean: 
 	@echo Cleaning
-	rm -rf docs/*.rpt
+	rm -rf docs/doc.rpt
+	rm -rf lint.rpt
 	rm -rf target
 	rm -rf project/target
 	rm -rf project/project 
@@ -55,42 +58,6 @@ clean:
 	rm -rf ${CORE_DIR}/target 
 	rm -rf ${CORE_DIR}/project/project 
 	rm -rf ${CORE_DIR}/project/target
-
-.PHONY: publish
-publish: 
-	@echo Publishing libraries locally
-	rm -rf /home/tws/.ivy2/local/org.chiselware/chiselware-syn_2.13
-	$(SBT) "project core" publishLocal | tee docs/publish.rpt
-
-# Generate the documentation
-.PHONY: docs
-docs:
-	@echo Building API docs
-	$(SBT) "project core" doc | tee docs/doc.rpt
-	firefox --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o01/t001/dff/index.html 2>/dev/null &
-	@echo Building User Guide
-	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex 
-# Rerun to generate TOC
-	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex | tee -a ../doc.rpt 
-# Clean up temp files
-	cd ${CORE_DIR}/docs/user-guide && rm *.aux *.toc *.out *.log 
-	firefox ${CORE_DIR}/docs/user-guide/${CORE}.pdf 2>/dev/null & 
-
-# Generate Verilog and synthesize
-.PHONY: verilog
-verilog:
-	@echo Generate Verilog for synthesis
-	mkdir -p ${CORE_DIR}/generated
-	$(SBT) "project core" run | tee ${CORE_DIR}/generated/verilog.rpt
-	rm -rf *anno.json
-
-# Run the tests
-.PHONY: test
-test:
-	@echo Running tests
-	mkdir -p ${CORE_DIR}/generated
-	$(SBT) "project core" test | tee ${CORE_DIR}/generated/test.rpt
-	rm -rf *anno.json
 
 # Run the tests with Scala code coverage enables
 .PHONY: cov
@@ -106,6 +73,50 @@ cov:
 	rm -rf *.anno.json
 	firefox --new-window ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html 2>/dev/null &
 
+# Generate the documentation
+.PHONY: docs
+docs:
+	@echo Building API docs
+	$(SBT) "project core" doc | tee docs/doc.rpt
+	firefox --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o01/t001/dff/index.html 2>/dev/null &
+	@echo Building User Guide
+	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex 
+# Rerun to generate TOC
+	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex | tee -a ../doc.rpt 
+# Clean up temp files
+	cd ${CORE_DIR}/docs/user-guide && rm *.aux *.toc *.out *.log 
+	firefox ${CORE_DIR}/docs/user-guide/${CORE}.pdf 2>/dev/null & 
+
+# Run the scalafix linters
+.PHONY: lint
+lint: 
+	@echo Running scalafix lint checks
+	rm -rf lint.rpt
+	$(SBT) "Compile/scalafixAll --check" "Test/scalafixAll --check" | tee lint.rpt
+
+# Publish locally
+.PHONY: publish
+publish: 
+	@echo Publishing libraries locally
+	rm -rf /home/tws/.ivy2/local/org.chiselware/chiselware-syn_2.13
+	$(SBT) "project core" publishLocal | tee docs/publish.rpt
+
+# Run the tests
+.PHONY: test
+test:
+	@echo Running tests
+	mkdir -p ${CORE_DIR}/generated
+	$(SBT) "project core" test | tee ${CORE_DIR}/generated/test.rpt
+	rm -rf *anno.json
+
+# Generate Verilog and synthesize
+.PHONY: verilog
+verilog:
+	@echo Generate Verilog for synthesis
+	mkdir -p ${CORE_DIR}/generated
+	$(SBT) "project core" run | tee ${CORE_DIR}/generated/verilog.rpt
+	rm -rf *anno.json
+
 # Run synthesis on generated Verilog; generate timing and area reports
 .PHONY: yosys
 yosys: 
@@ -115,4 +126,3 @@ yosys:
 	echo "                      SUMMARY                            "
 	echo "---------------------------------------------------------"
 	cat ${CORE_DIR}/generated/synTestCases/{area,timing}_summary.rpt
-

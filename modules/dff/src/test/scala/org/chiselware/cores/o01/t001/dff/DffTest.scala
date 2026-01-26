@@ -4,15 +4,12 @@
 package org.chiselware.cores.o01.t001.dff
 
 import chisel3._
-import chisel3.util._
 import chiseltest._
-import chiseltest.coverage._
+import firrtl2.options.TargetDirAnnotation
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.Assertions._
-import firrtl2.options.TargetDirAnnotation
-import scala.util.Random
-import java.io.{File}
+
+import java.io.File
 
 class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
 
@@ -21,7 +18,6 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
     main(configName, config)
   }
 
-  // Create a directory for storing the Scala coverage reports
   val scalaCoverageDir = new File("generated/scalaCoverage")
   scalaCoverageDir.mkdir()
 
@@ -51,7 +47,7 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
 
     it should "perform these tests successfully " in {
       test(new DffTb(p))
-        .withAnnotations(backendAnnotations) { dut =>
+        .withAnnotations(annotationSeq = backendAnnotations) { dut =>
           dut.clock.setTimeout(0)
           // Initialize the inputs
           dut.io.enable.poke(false.B)

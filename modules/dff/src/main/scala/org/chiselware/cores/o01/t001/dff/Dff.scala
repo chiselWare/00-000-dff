@@ -3,10 +3,11 @@
 
 package org.chiselware.cores.o01.t001.dff
 
-import chisel3._
-import chisel3.util._
 import _root_.circt.stage.ChiselStage
-import org.chiselware.syn.{YosysTclFile, StaTclFile, RunScriptFile}
+import chisel3._
+import org.chiselware.syn.RunScriptFile
+import org.chiselware.syn.StaTclFile
+import org.chiselware.syn.YosysTclFile
 
 /** A D-Flip-Flop with asynchronous reset
   *
@@ -44,13 +45,13 @@ class Dff(p: DffParams) extends Module {
   * part of the regression framework.
   */
 object Main extends App {
-  val mainClassName = "Dff"
-  val coreDir = s"modules/${mainClassName.toLowerCase()}"
+  val MainClassName = "Dff"
+  val coreDir = s"modules/${MainClassName.toLowerCase()}"
   DffParams.synConfigMap.foreach { case (configName, configParams) =>
     println()
     println(s"Generating Verilog for config: $configName")
     ChiselStage.emitSystemVerilog(
-      new Dff(configParams),
+      gen = new Dff(configParams),
       firtoolOpts = Array(
         "--lowering-options=disallowLocalVariables,disallowPackedArrays",
         "--disable-all-randomization",
@@ -61,20 +62,20 @@ object Main extends App {
     )
 
     // Generate synthesis files and scripts
-    sdcFile.create(
-      configParams,
-      s"${coreDir}/generated/synTestCases/$configName"
+    SdcFile.create(
+      p = configParams,
+      sdcFilePath = s"${coreDir}/generated/synTestCases/$configName"
     )
     YosysTclFile.create(
-      mainClassName,
+      MainClassName,
       s"${coreDir}/generated/synTestCases/$configName"
     )
     StaTclFile.create(
-      mainClassName,
+      MainClassName,
       s"${coreDir}/generated/synTestCases/$configName"
     )
     RunScriptFile.create(
-      mainClassName,
+      MainClassName,
       DffParams.synConfigs,
       s"${coreDir}/generated/synTestCases"
     )

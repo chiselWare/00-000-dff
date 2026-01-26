@@ -3,10 +3,9 @@
 
 package org.chiselware.cores.o01.t001.dff
 
-import chisel3._
-import chisel3.util._
+import java.io.File
+import java.io.PrintWriter
 import scala.collection.mutable.LinkedHashMap
-import java.io.{File, PrintWriter}
 
 /** Default parameter settings for Dff
   *
@@ -33,6 +32,9 @@ case class DffParams(
   * ```
   *  For sim, use lowerCamel case conventions: myConfig1, etc.
   *  For syn, use snake_case, typical for Verilog: my_config_1
+  *
+  *  Note that these are constants and thus follow the UpperCamelCase
+  *  convention.
   * ```
   */
 object DffParams {
@@ -57,8 +59,7 @@ object DffParams {
 /** Customize this companion object with your port list and desired synthesis
   * contraints.
   */
-
-object sdcFile {
+object SdcFile {
   def create(p: DffParams, sdcFilePath: String): Unit = {
     // Default constraints, tighten or loosen as necessary
     val period = 5.000 // ns
@@ -87,4 +88,5 @@ object sdcFile {
     sdcFile.write(s"${sdcFileData}")
     sdcFile.close()
   }
+
 }

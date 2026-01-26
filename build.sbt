@@ -1,7 +1,25 @@
-ThisBuild / scalaVersion := "2.13.13"
 ThisBuild / version := "0.1.0"
+ThisBuild / scalaVersion := "2.13.13"
 ThisBuild / organization := "org.chiselware"
 ThisBuild / organizationName := "Chiselware"
+
+// Scalafix settings, special configuration for test
+ThisBuild / scalafixConfig := Some(baseDirectory.value / ".scalafix.conf")
+ThisBuild / (Test / scalafixConfig) := Some(
+  baseDirectory.value / ".scalafix-test.conf"
+)
+
+ThisBuild / scalafixOnCompile := false
+ThisBuild / scalacOptions += "-Wunused:imports"
+inThisBuild(
+  List(
+    scalaVersion := "2.13.13",
+    semanticdbEnabled := true,
+    semanticdbVersion := scalafixSemanticdb.revision
+  )
+)
+ThisBuild / scalafixDependencies +=
+  "org.chiselware" %% "chiselware-scalafix-rules" % "0.4.0"
 
 Compile / doc / scalacOptions ++= Seq("-groups", "-implicits")
 
