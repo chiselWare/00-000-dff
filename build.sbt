@@ -19,7 +19,7 @@ inThisBuild(
   )
 )
 ThisBuild / scalafixDependencies +=
-  "org.chiselware" %% "chiselware-scalafix-rules" % "0.4.0"
+  "org.chiselware" %% "chiselware-scalafix-rules" % "0.5.0"
 
 Compile / doc / scalacOptions ++= Seq("-groups", "-implicits")
 
