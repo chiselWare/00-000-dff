@@ -47,18 +47,20 @@ class Dff(p: DffParams) extends Module {
 object Main extends App {
   val MainClassName = "Dff"
   val coreDir = s"modules/${MainClassName.toLowerCase()}"
+
   DffParams.synConfigMap.foreach { case (configName, configParams) =>
+    val myOpts = Array(
+      "--lowering-options=disallowLocalVariables,disallowPackedArrays",
+      "--disable-all-randomization",
+      "--strip-debug-info",
+      "--split-verilog",
+      s"-o=${coreDir}/generated/synTestCases/$configName"
+    )
     println()
     println(s"Generating Verilog for config: $configName")
     ChiselStage.emitSystemVerilog(
-      gen = new Dff(configParams),
-      firtoolOpts = Array(
-        "--lowering-options=disallowLocalVariables,disallowPackedArrays",
-        "--disable-all-randomization",
-        "--strip-debug-info",
-        "--split-verilog",
-        s"-o=${coreDir}/generated/synTestCases/$configName"
-      )
+      gen = new Dff(p = configParams),
+      firtoolOpts = myOpts
     )
 
     // Generate synthesis files and scripts
@@ -67,17 +69,17 @@ object Main extends App {
       sdcFilePath = s"${coreDir}/generated/synTestCases/$configName"
     )
     YosysTclFile.create(
-      MainClassName,
-      s"${coreDir}/generated/synTestCases/$configName"
+      mainClassName = MainClassName,
+      synTestDir = s"${coreDir}/generated/synTestCases/$configName"
     )
     StaTclFile.create(
-      MainClassName,
-      s"${coreDir}/generated/synTestCases/$configName"
+      mainClassName = MainClassName,
+      synTestDir = s"${coreDir}/generated/synTestCases/$configName"
     )
     RunScriptFile.create(
-      MainClassName,
-      DffParams.synConfigs,
-      s"${coreDir}/generated/synTestCases"
+      mainClassName = MainClassName,
+      configs = DffParams.synConfigs,
+      runDir = s"${coreDir}/generated/synTestCases"
     )
   }
 }

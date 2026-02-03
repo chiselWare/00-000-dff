@@ -4,7 +4,7 @@ SBT = sbt
 SHELL := /bin/bash
 CORE_DIR := "modules/dff"
 GEN_DIR := "${CORE_DIR}/generated"
-ERROR_REP := "${GEN_DIR}/error.rpt"
+ERROR_REP := "error.rpt"
 TC_DIR := "${GEN_DIR}/synTestCases"
 CORE := "Dff"
 
@@ -14,31 +14,40 @@ list:
 	@grep '^[^#[:space:]].*:' Makefile
 
 .PHONY: all
-all: clean lint cov yosys docs check
+all: clean lint publish cov yosys docs check
 
 .PHONY: check
 check: 
 	@echo 
 	@echo Checking for errors
-	rm -rf ${CORE_DIR}/generated/error.rpt
-# root
-	grep -Hn -E "Error|error" docs/doc.rpt | tee -a ${ERROR_REP}
-# lint
+	rm -rf ${ERROR_REP}
+# lint (scalafix) and format (scalafmt) checks
+	grep -Hn -E "\[error] scalafmt" lint.rpt | tee -a ${ERROR_REP} 
+	grep -Hn -E "\[error] ---" lint.rpt | tee -a ${ERROR_REP} 
 	grep -Hn -E "Error|error" lint.rpt | tee -a ${ERROR_REP}
-# core docs
+
+# docs
+	grep -Hn -E "Error|error" docs/doc.rpt | tee -a ${ERROR_REP}
 	grep -Hn -E "Error|error" ${CORE_DIR}/docs/doc.rpt | tee -a ${ERROR_REP} 
+
+# publish
+	grep -Hn -E "Error|error|Warn|warn" ./docs/publish.rpt | tee -a ${ERROR_REP} 
+
 # test and verilog reports
 	grep -Hn -E "Error|error" ${GEN_DIR}/verilog.rpt | tee -a ${ERROR_REP} 
 	grep -Hn -E "Error|error" ${GEN_DIR}/test.rpt | tee -a ${ERROR_REP} 
 	grep -Hn -E "fail" ${GEN_DIR}/test.rpt | grep -v "failed 0" | tee -a ${ERROR_REP} 
+
 # summary reports
 	grep -Hn -E "Error|error" ${TC_DIR}/area_summary.rpt | tee -a ${ERROR_REP} 
 	grep -Hn -E "Error|error" ${TC_DIR}/timing_summary.rpt | tee -a ${ERROR_REP} 
+
 # synTestCases
 	grep -Hn -E "Error|error" ${TC_DIR}/*/timing.rpt | tee -a ${ERROR_REP} 
 	grep -Hn -E "Error|error" ${TC_DIR}/*/yosys.log | tee -a ${ERROR_REP} 
+
 # check for errors
-	@if [ ! -s ${CORE_DIR}/generated/error.rpt ]; then \
+	@if [ ! -s ${ERROR_REP} ]; then \
 	  printf "\033[1;32mALL TESTS PASSED WITH NO ERRORS\033[0m\n" ;\
 	else \
 	  printf "\033[1;31mTESTS COMPLETED WITH ERRORS\033[0m\n" ;\
@@ -49,7 +58,9 @@ check:
 clean: 
 	@echo Cleaning
 	rm -rf docs/doc.rpt
+	rm -rf docs/publish.rpt
 	rm -rf lint.rpt
+	rm -rf error.rpt
 	rm -rf target
 	rm -rf project/target
 	rm -rf project/project 
@@ -79,6 +90,7 @@ docs:
 	@echo Building API docs
 	$(SBT) "project core" doc | tee docs/doc.rpt
 	firefox --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o01/t001/dff/index.html 2>/dev/null &
+
 	@echo Building User Guide
 	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex 
 # Rerun to generate TOC
@@ -90,9 +102,11 @@ docs:
 # Run the scalafix linters
 .PHONY: lint
 lint: 
-	@echo Running scalafix lint checks
 	rm -rf lint.rpt
-	$(SBT) "Compile/scalafixAll --check" "Test/scalafixAll --check" | tee lint.rpt
+	@echo Running scalafmt checks
+	$(SBT) "scalafmtCheck" | tee -a lint.rpt
+	@echo Running scalafix lint checks
+	$(SBT) "Compile/scalafixAll --check" "Test/scalafixAll --check" | tee -a lint.rpt
 
 # Publish locally
 .PHONY: publish

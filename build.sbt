@@ -1,5 +1,18 @@
-ThisBuild / version := "0.1.0"
-ThisBuild / scalaVersion := "2.13.13"
+// chiselWare versions
+val coreVersion = "0.5.3"
+val chiselWareVersion = "0.5.0"
+val chiselWareScalaVersion = "2.13.13"
+
+// chisel versions
+val chiselVersion = "5.3.0"
+val chiselTestVer = "5.0.2"
+
+// scala versions
+val scalafmtVersion = "2.5.0"
+val scalaTestVer = "3.2.18"
+
+ThisBuild / version := coreVersion
+ThisBuild / scalaVersion := chiselWareScalaVersion
 ThisBuild / organization := "org.chiselware"
 ThisBuild / organizationName := "Chiselware"
 
@@ -13,29 +26,28 @@ ThisBuild / scalafixOnCompile := false
 ThisBuild / scalacOptions += "-Wunused:imports"
 inThisBuild(
   List(
-    scalaVersion := "2.13.13",
+    scalaVersion := chiselWareScalaVersion,
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision
   )
 )
 ThisBuild / scalafixDependencies +=
-  "org.chiselware" %% "chiselware-scalafix-rules" % "0.5.0"
+  "org.chiselware" %% "chiselware-scalafix-rules" % chiselWareVersion
+
+// pull from local temporarily
+ThisBuild / scalafixDependencies +=
+  "org.chiselware" %% "chiselware-scalafix-rules" % "0.5.4"
 
 Compile / doc / scalacOptions ++= Seq("-groups", "-implicits")
 
 Test / parallelExecution := false
-
-val chiselVersion = "5.3.0"
-val chiselTestVer = "5.0.2"
-val scalafmtVersion = "2.5.0"
-val scalaTestVer = "3.2.18"
 
 lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.chipsalliance" %% "chisel" % chiselVersion,
     "edu.berkeley.cs" %% "chiseltest" % chiselTestVer % Test,
     "org.scalatest" %% "scalatest" % scalaTestVer % Test,
-    "org.chiselware" %% "chiselware-syn" % "0.1.0"
+    "org.chiselware" %% "chiselware-syn" % chiselWareVersion
   ),
   scalacOptions ++= Seq(
     "-language:reflectiveCalls",
@@ -65,6 +77,7 @@ lazy val core = project
     coverageMinimumStmtTotal := 90,
     coverageMinimumBranchTotal := 95,
     publish / skip := true,
-    Compile / mainClass := Some("org.chiselware.cores.o01.t001.dff.Main")
+    Compile / mainClass := Some("org.chiselware.cores.o01.t001.dff.Main"),
+    Compile / doc / skip := false
   )
   .settings(commonSettings: _*)

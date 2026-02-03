@@ -15,7 +15,7 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
 
   // Execute the main test for each configuration
   for ((configName, config) <- DffParams.simConfigMap) {
-    main(configName, config)
+    main(configName = configName, p = config)
   }
 
   val scalaCoverageDir = new File("generated/scalaCoverage")
