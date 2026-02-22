@@ -1,13 +1,12 @@
 // (c) <year> <your name or company>
 // This code is licensed under the <name of license> (see LICENSE.MD)
 
-package org.chiselware.cores.o01.t001.dff
+package org.chiselware.cores.o00.t000.dff
 
 import _root_.circt.stage.ChiselStage
 import chisel3._
-import org.chiselware.syn.RunScriptFile
-import org.chiselware.syn.StaTclFile
-import org.chiselware.syn.YosysTclFile
+import org.chiselware.ipf.{ IpfJsonFile, ParamCli }
+import org.chiselware.syn.{ RunScriptFile, StaTclFile, YosysTclFile }
 
 /** A D-Flip-Flop with asynchronous reset
   *
@@ -82,4 +81,42 @@ object Main extends App {
       runDir = s"${coreDir}/generated/synTestCases"
     )
   }
+}
+
+/** Generate artifacts for the IP Factory to download upon a user request.
+  * ```
+  * This includes
+  * - A single Verilog configuration consisting of a filelist.f & Verilog files
+  * - An sdc file
+  * - The core's User Guide (in PDF)
+  * - A JSON file
+  *
+  * This is executed by the following SBT command line:
+  *
+  * sbt "project core" "runMain org.chiselware.cores.o00.t000.dff.GenVerWithParamCli -- --params='(width=8)'"
+  * ```
+  */
+object GenVerWithParamCli extends App {
+  val MainClassName = "Dff"
+  val p = ParamCli.parseParams(args)
+  val params = DffParams.fromMap(p)
+
+  ChiselStage.emitSystemVerilog(
+    new Dff(params),
+    firtoolOpts = Array(
+      "--lowering-options=disallowLocalVariables,disallowPackedArrays",
+      "--disable-all-randomization",
+      "--strip-debug-info",
+      "--split-verilog",
+      s"-o=.ipf"
+    )
+  )
+
+  SdcFile.create(
+    p = params,
+    sdcFilePath = ".ipf"
+  )
+
+  IpfJsonFile.create(MainClassName)
+
 }

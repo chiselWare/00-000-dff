@@ -4,6 +4,7 @@
 # Chisel
 lint.rpt
 error.rpt
+ipf.rpt
 project/*
 !/project/build.properties
 !/project/plugins.sbt

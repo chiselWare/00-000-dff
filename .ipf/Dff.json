@@ -1,0 +1,7 @@
+[
+          {
+            "name": "width",
+            "type": "field",
+            "requirement: "width must be greater than 0"
+          },
+        ]

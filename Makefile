@@ -2,6 +2,7 @@ MAKEFLAGS += --silent
 	
 SBT = sbt
 SHELL := /bin/bash
+CORE_NAME := Dff
 CORE_DIR := "modules/dff"
 GEN_DIR := "${CORE_DIR}/generated"
 ERROR_REP := "error.rpt"
@@ -14,7 +15,7 @@ list:
 	@grep '^[^#[:space:]].*:' Makefile
 
 .PHONY: all
-all: clean lint publish cov yosys docs check
+all: clean lint publish cov yosys docs ipf check
 
 .PHONY: check
 check: 
@@ -46,6 +47,22 @@ check:
 	grep -Hn -E "Error|error" ${TC_DIR}/*/timing.rpt | tee -a ${ERROR_REP} 
 	grep -Hn -E "Error|error" ${TC_DIR}/*/yosys.log | tee -a ${ERROR_REP} 
 
+# check that IP Factory objects were correctly generated
+	@if [ ! -f .ipf/${CORE_NAME}.json ]; then \
+		printf "Error - Missing JSON file\n" | tee -a ${ERROR_REP}; \
+	fi
+	@if [ ! -f .ipf/${CORE_NAME}.pdf ]; then \
+		printf "Error - Missing User Guide\n" | tee -a ${ERROR_REP}; \
+	fi
+	@if [ ! -f .ipf/${CORE_NAME}.sdc  ]; then \
+		printf "Error - Missing SDC file\n" | tee -a ${ERROR_REP}; \
+	fi
+
+# existence of this file is an implicit check there are also Verilog files
+	@if [ ! -f ".ipf/filelist.f" ]; then \
+		printf "Error - Missing Verilog file list\n" | tee ${ERROR_REP}; \
+	fi
+
 # check for errors
 	@if [ ! -s ${ERROR_REP} ]; then \
 	  printf "\033[1;32mALL TESTS PASSED WITH NO ERRORS\033[0m\n" ;\
@@ -57,8 +74,8 @@ check:
 .PHONY: clean
 clean: 
 	@echo Cleaning
-	rm -rf docs/doc.rpt
-	rm -rf docs/publish.rpt
+	rm -rf docs/*.rpt
+	rm -rf ipf.rpt
 	rm -rf lint.rpt
 	rm -rf error.rpt
 	rm -rf target
@@ -80,6 +97,7 @@ cov:
 	"project core" \
 	test \
 	run  \
+	"runMain org.chiselware.cores.o00.t000.dff.GenVerWithParamCli -- --params='(width=1)'" \
 	coverageReport | tee ${CORE_DIR}/generated/test.rpt
 	rm -rf *.anno.json
 	firefox --new-window ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html 2>/dev/null &
@@ -89,7 +107,7 @@ cov:
 docs:
 	@echo Building API docs
 	$(SBT) "project core" doc | tee docs/doc.rpt
-	firefox --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o01/t001/dff/index.html 2>/dev/null &
+	firefox --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o00/t000/dff/index.html 2>/dev/null &
 
 	@echo Building User Guide
 	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex 
@@ -99,7 +117,16 @@ docs:
 	cd ${CORE_DIR}/docs/user-guide && rm *.aux *.toc *.out *.log 
 	firefox ${CORE_DIR}/docs/user-guide/${CORE}.pdf 2>/dev/null & 
 
-# Run the scalafix linters
+.PHONY: ipf 
+ipf:
+# Generate IP Factory deliverables
+	@echo Building artifacts for the IP Factory to download
+	sbt "project core" "runMain org.chiselware.cores.o00.t000.dff.GenVerWithParamCli -- --params='(width=1)'" | tee -a ipf.rpt 
+# Copy the User Guide to the .ipf/ directory for upload
+	cp -f ${CORE_DIR}/docs/user-guide/${CORE}.pdf .ipf/${CORE.pdf}
+	rm -rf *.anno.json
+
+# Run the scalafix and scalafmt linters
 .PHONY: lint
 lint: 
 	rm -rf lint.rpt
@@ -112,7 +139,6 @@ lint:
 .PHONY: publish
 publish: 
 	@echo Publishing libraries locally
-	rm -rf /home/tws/.ivy2/local/org.chiselware/chiselware-syn_2.13
 	$(SBT) "project core" publishLocal | tee docs/publish.rpt
 
 # Run the tests

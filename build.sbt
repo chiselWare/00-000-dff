@@ -1,6 +1,6 @@
 // chiselWare versions
-val coreVersion = "0.5.3"
-val chiselWareVersion = "0.5.0"
+val coreVersion = "0.6.0"
+val chiselWareVersion = "0.6.0"
 val chiselWareScalaVersion = "2.13.13"
 
 // chisel versions
@@ -36,7 +36,7 @@ ThisBuild / scalafixDependencies +=
 
 // pull from local temporarily
 ThisBuild / scalafixDependencies +=
-  "org.chiselware" %% "chiselware-scalafix-rules" % "0.5.4"
+  "org.chiselware" %% "chiselware-scalafix-rules" % chiselWareVersion
 
 Compile / doc / scalacOptions ++= Seq("-groups", "-implicits")
 
@@ -47,7 +47,8 @@ lazy val commonSettings = Seq(
     "org.chipsalliance" %% "chisel" % chiselVersion,
     "edu.berkeley.cs" %% "chiseltest" % chiselTestVer % Test,
     "org.scalatest" %% "scalatest" % scalaTestVer % Test,
-    "org.chiselware" %% "chiselware-syn" % chiselWareVersion
+    "org.chiselware" %% "chiselware-syn" % chiselWareVersion,
+    "org.chiselware" %% "chiselware-ipf" % chiselWareVersion
   ),
   scalacOptions ++= Seq(
     "-language:reflectiveCalls",
@@ -57,7 +58,8 @@ lazy val commonSettings = Seq(
     "-Ymacro-annotations"
   ),
   addCompilerPlugin(
-    "org.chipsalliance" % "chisel-plugin" % chiselVersion cross CrossVersion.full
+    "org.chipsalliance" % "chisel-plugin" % chiselVersion cross
+      CrossVersion.full
   )
 )
 
@@ -76,8 +78,8 @@ lazy val core = project
     coverageFailOnMinimum := true,
     coverageMinimumStmtTotal := 90,
     coverageMinimumBranchTotal := 95,
-    publish / skip := true,
-    Compile / mainClass := Some("org.chiselware.cores.o01.t001.dff.Main"),
+    publish / skip := true, // no API for cores
+    Compile / mainClass := Some("org.chiselware.cores.o00.t000.dff.Main"),
     Compile / doc / skip := false
   )
   .settings(commonSettings: _*)

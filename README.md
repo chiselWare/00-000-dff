@@ -79,6 +79,8 @@ Warren Savage
 
 ## Version History
 
+* 0.6.0
+    * Added IPF interface, update scalafmt and scalafix rules
 * 0.1.3
     * Switch from google-chrome to firefox
 * 0.1.2

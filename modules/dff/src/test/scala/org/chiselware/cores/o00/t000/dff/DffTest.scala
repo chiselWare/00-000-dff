@@ -1,7 +1,7 @@
 // (c) <year> <your name or company>
 // This code is licensed under the <name of license> (see LICENSE.MD)
 
-package org.chiselware.cores.o01.t001.dff
+package org.chiselware.cores.o00.t000.dff
 
 import chisel3._
 import chiseltest._

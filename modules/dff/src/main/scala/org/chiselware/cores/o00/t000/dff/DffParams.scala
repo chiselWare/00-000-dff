@@ -1,10 +1,9 @@
 // (c) <year> <your name or company>
 // This code is licensed under the <name of license> (see LICENSE.MD)
 
-package org.chiselware.cores.o01.t001.dff
+package org.chiselware.cores.o00.t000.dff
 
-import java.io.File
-import java.io.PrintWriter
+import java.io.{ File, PrintWriter }
 import scala.collection.mutable.LinkedHashMap
 
 /** Default parameter settings for Dff
@@ -19,9 +18,8 @@ import scala.collection.mutable.LinkedHashMap
   *   [[http://www.mycompany.com]] for more information
   */
 case class DffParams(
-    width: Int = 1
-) {
-  require(width >= 1, "Width must be greater than or equal 1")
+    width: Int = 1) {
+  require(width >= 1, "width must be greater than or equal 1")
 }
 
 /** Define a companion object to hold a Map of the configurations and the order
@@ -54,13 +52,23 @@ object DffParams {
   val synConfigs = DffParams.synConfigMap
     .map { case (configName, config) => s"$configName" }
     .mkString(" ")
+
+  // Package parameter names for import to IP Factory
+  def fromMap(m: Map[String, String]): DffParams = {
+    val width = m.get("width").map(_.toInt).getOrElse(1)
+    // add all additional synthesis parameters here
+    DffParams(width = width) // extend with more params as needed
+  }
 }
 
 /** Customize this companion object with your port list and desired synthesis
   * contraints.
   */
 object SdcFile {
-  def create(p: DffParams, sdcFilePath: String): Unit = {
+  def create(
+      p: DffParams,
+      sdcFilePath: String
+    ): Unit = {
     // Default constraints, tighten or loosen as necessary
     val period = 5.000 // ns
     val dutyCycle = 0.50
@@ -72,7 +80,8 @@ object SdcFile {
     val outputDelay = period * outputDelayPct
     val fallingEdge = period * dutyCycle
 
-    val sdcFileData = s"""
+    val sdcFileData =
+      s"""
       |create_clock -period $period -waveform {0 $fallingEdge} clock
       |set_input_delay -clock clock $inputDelay {reset}
       |set_input_delay -clock clock $inputDelay {io_d}
