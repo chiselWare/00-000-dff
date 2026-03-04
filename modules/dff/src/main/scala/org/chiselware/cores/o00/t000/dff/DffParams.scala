@@ -3,6 +3,8 @@
 
 package org.chiselware.cores.o00.t000.dff
 
+import org.chiselware.ipf.{ FieldType, IpfParams }
+
 import java.io.{ File, PrintWriter }
 import scala.collection.mutable.LinkedHashMap
 
@@ -19,7 +21,8 @@ import scala.collection.mutable.LinkedHashMap
   */
 case class DffParams(
     width: Int = 1) {
-  require(width >= 1, "width must be greater than or equal 1")
+  val widthMsg = "width must be greater than or equal 1"
+  require(width >= 1, widthMsg)
 }
 
 /** Define a companion object to hold a Map of the configurations and the order
@@ -36,6 +39,7 @@ case class DffParams(
   * ```
   */
 object DffParams {
+  val MainClassName = "Dff"
   val simConfigMap = LinkedHashMap[String, DffParams](
     "config8" -> DffParams(width = 8),
     "config32" -> DffParams(width = 32),
@@ -98,4 +102,18 @@ object SdcFile {
     sdcFile.close()
   }
 
+}
+
+object IpfParamsMap {
+  val params = Map(
+    "width" ->
+      IpfParams(
+        fieldType = FieldType.Field,
+        pickList = List.empty,
+        message = Some(DffParams().widthMsg)
+        // add remaining parameters as needed, here are some examples
+        // "useFifo" -> IpfParams(FieldType.Toggle, List.empty, None),
+        // "cacheSize" -> IpfParams(FieldType.Pick, List("32", "64", "128"), None)
+      )
+  )
 }

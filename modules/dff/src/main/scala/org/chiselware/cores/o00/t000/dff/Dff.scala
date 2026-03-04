@@ -44,8 +44,7 @@ class Dff(p: DffParams) extends Module {
   * part of the regression framework.
   */
 object Main extends App {
-  val MainClassName = "Dff"
-  val coreDir = s"modules/${MainClassName.toLowerCase()}"
+  val coreDir = s"modules/${DffParams.MainClassName.toLowerCase()}"
 
   DffParams.synConfigMap.foreach { case (configName, configParams) =>
     val myOpts = Array(
@@ -68,15 +67,15 @@ object Main extends App {
       sdcFilePath = s"${coreDir}/generated/synTestCases/$configName"
     )
     YosysTclFile.create(
-      mainClassName = MainClassName,
+      mainClassName = DffParams.MainClassName,
       synTestDir = s"${coreDir}/generated/synTestCases/$configName"
     )
     StaTclFile.create(
-      mainClassName = MainClassName,
+      mainClassName = DffParams.MainClassName,
       synTestDir = s"${coreDir}/generated/synTestCases/$configName"
     )
     RunScriptFile.create(
-      mainClassName = MainClassName,
+      mainClassName = DffParams.MainClassName,
       configs = DffParams.synConfigs,
       runDir = s"${coreDir}/generated/synTestCases"
     )
@@ -97,7 +96,6 @@ object Main extends App {
   * ```
   */
 object GenVerWithParamCli extends App {
-  val MainClassName = "Dff"
   val p = ParamCli.parseParams(args)
   val params = DffParams.fromMap(p)
 
@@ -117,6 +115,9 @@ object GenVerWithParamCli extends App {
     sdcFilePath = ".ipf"
   )
 
-  IpfJsonFile.create(MainClassName)
+  IpfJsonFile.create(
+    p = IpfParamsMap.params,
+    jsonFilePath = s".ipf/${DffParams.MainClassName}.json"
+  )
 
 }

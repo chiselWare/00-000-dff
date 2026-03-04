@@ -48,6 +48,12 @@ check:
 	grep -Hn -E "Error|error" ${TC_DIR}/*/yosys.log | tee -a ${ERROR_REP} 
 
 # check that IP Factory objects were correctly generated
+	@if [ ! -f .ipf/filelist.f ]; then \
+		printf "Error - Missing filelist file\n" | tee -a ${ERROR_REP}; \
+	fi
+	 @if [ ! -f .ipf/${CORE_NAME}.sv -a -f .ipf/${CORE_NAME}.v ]; then \
+	printf "Error - Missing Verilog file\n" | tee -a ${ERROR_REP}; \
+	fi
 	@if [ ! -f .ipf/${CORE_NAME}.json ]; then \
 		printf "Error - Missing JSON file\n" | tee -a ${ERROR_REP}; \
 	fi
@@ -76,6 +82,7 @@ clean:
 	@echo Cleaning
 	rm -rf docs/*.rpt
 	rm -rf ipf.rpt
+	rm -rf .ipf/*
 	rm -rf lint.rpt
 	rm -rf error.rpt
 	rm -rf target

@@ -12,6 +12,10 @@ modules/*/generated/*
 modules/*/target/*
 modules/*/.scala-build/*
 target/*
+./ipf/*
+!./ipf.json
+!./ipf.pdf
+
 
 # Visual Studio
 .vscode
