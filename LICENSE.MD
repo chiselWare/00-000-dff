@@ -1,3 +1,5 @@
+Copyright (c) <year> <Your Name or Organization>
+
 Apache License
 ==============
 

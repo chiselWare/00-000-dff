@@ -1,6 +1,6 @@
 // chiselWare versions
-val coreVersion = "0.7.0"
-val chiselWareVersion = "0.7.0"
+val coreVersion = "0.8.0"
+val chiselWareVersion = "0.8.0"
 val chiselWareScalaVersion = "2.13.13"
 
 // chisel versions

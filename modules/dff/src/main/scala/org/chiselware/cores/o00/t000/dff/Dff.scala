@@ -24,6 +24,14 @@ import org.chiselware.syn.{ RunScriptFile, StaTclFile, YosysTclFile }
   * <img src="doc/images/user-guide/dff-block-diagram.png" />
   */
 
+/** Companion object to allow factory method instantiation, such as myDff =
+  * Dff(width = 8)
+  */
+
+object Dff {
+  def apply(params: DffParams): Dff = Module(new Dff(params))
+}
+
 class Dff(p: DffParams) extends Module {
   val io = IO(new Bundle {
     val d = Input(UInt(p.width.W))

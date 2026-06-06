@@ -18,7 +18,7 @@ class DffTb(p: DffParams) extends Module {
     val enable = Input(Bool())
   })
 
-  val dut = Module(new Dff(p))
+  val dut = Dff(p)
   dut.io.d := io.in
   dut.io.enable := io.enable
   io.out := dut.io.q
