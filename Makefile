@@ -1,13 +1,25 @@
+# -- Core Configuration ------------------------------------------------------
+ORG_ID := "00"
+TEAM_ID := "000"
+CORE_NAME := "Dff"
+# -- End Core Configuration -- do not modify below this line ------------------
+
 MAKEFLAGS += --silent
-	
-SBT = sbt
 SHELL := /bin/bash
-CORE_NAME := Dff
-CORE_DIR := "modules/dff"
+CORE_NAME_LC=$(shell echo $(CORE_NAME) | tr '[:upper:]' '[:lower:]')
+CORE_DIR := "modules/$(CORE_NAME_LC)"
 GEN_DIR := "${CORE_DIR}/generated"
 ERROR_REP := "error.rpt"
 TC_DIR := "${GEN_DIR}/synTestCases"
-CORE := "Dff"
+
+# Some gymnastics are required to get Firefox to behave nicely in both native
+# Linux and containerized Linux environments through the use of profiles. Also
+# included in the profiles are switches to prevent new user startup tabs.
+FIREFOX_PROFILE_BASE = .firefox-profiles
+FIREFOX = bash -c 'mkdir -p $(FIREFOX_PROFILE_BASE)/ff-$$$$ && \
+    echo "user_pref(\"browser.startup.homepage_override.mstone\", \"ignore\");" > $(FIREFOX_PROFILE_BASE)/ff-$$$$/user.js && \
+    echo "user_pref(\"datareporting.policy.dataSubmissionPolicyBypassNotification\", true);" >> $(FIREFOX_PROFILE_BASE)/ff-$$$$/user.js && \
+    firefox --no-remote --profile $(FIREFOX_PROFILE_BASE)/ff-$$$$ "$$1" 2>/dev/null &' --
 
 # Run everything and scan for errors
 .PHONY: list
@@ -63,6 +75,7 @@ check:
 	@if [ ! -f .ipf/${CORE_NAME}.sdc  ]; then \
 		printf "Error - Missing SDC file\n" | tee -a ${ERROR_REP}; \
 	fi
+	grep -q "8" .ipf/${CORE_NAME}.sv || echo "Error: Parameter not passed" >> ${ERROR_REP}
 
 # existence of this file is an implicit check there are also Verilog files
 	@if [ ! -f ".ipf/filelist.f" ]; then \
@@ -93,44 +106,45 @@ clean:
 	rm -rf ${CORE_DIR}/target 
 	rm -rf ${CORE_DIR}/project/project 
 	rm -rf ${CORE_DIR}/project/target
+	rm -rf $(FIREFOX_PROFILE_BASE)
 
 # Run the tests with Scala code coverage enables
 .PHONY: cov
 cov:
 	@echo Running tests with coverage enabled
 	mkdir -p ${CORE_DIR}/generated
-	$(SBT) clean \
+	sbt clean \
 	coverageOn \
 	"project core" \
 	test \
 	run  \
-	"runMain org.chiselware.cores.o00.t000.dff.GenVerWithParamCli -- --params='(width=1)'" \
+	"runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(width=1)'" \
 	coverageReport | tee ${CORE_DIR}/generated/test.rpt
 	rm -rf *.anno.json
-	firefox --new-window ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html 2>/dev/null &
+	${FIREFOX} ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html 2>/dev/null &
 
 # Generate the documentation
 .PHONY: docs
 docs:
 	@echo Building API docs
-	$(SBT) "project core" doc | tee docs/doc.rpt
-	firefox --new-window ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o00/t000/dff/index.html 2>/dev/null &
+	sbt "project core" doc | tee docs/doc.rpt
+	${FIREFOX} ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o${ORG_ID}/t${TEAM_ID}/${CORE_NAME_LC}/index.html 2>/dev/null &
 
 	@echo Building User Guide
-	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex 
+	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE_NAME}.tex 
 # Rerun to generate TOC
-	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE}.tex | tee -a ../doc.rpt 
+	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE_NAME}.tex | tee -a ../doc.rpt 
 # Clean up temp files
-	cd ${CORE_DIR}/docs/user-guide && rm *.aux *.toc *.out *.log 
-	firefox ${CORE_DIR}/docs/user-guide/${CORE}.pdf 2>/dev/null & 
+	cd ${CORE_DIR}/docs/user-guide && rm *.aux *.toc *.out *.log
+	${FIREFOX} ${CORE_DIR}/docs/user-guide/${CORE_NAME}.pdf 2>/dev/null & 
 
 .PHONY: ipf 
 ipf:
 # Generate IP Factory deliverables
 	@echo Building artifacts for the IP Factory to download
-	sbt "project core" "runMain org.chiselware.cores.o00.t000.dff.GenVerWithParamCli -- --params='(width=1)'" | tee -a ipf.rpt 
+	sbt "project core" "runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(width=8)'" | tee -a ipf.rpt 
 # Copy the User Guide to the .ipf/ directory for upload
-	cp -f ${CORE_DIR}/docs/user-guide/${CORE}.pdf .ipf/${CORE.pdf}
+	cp -f ${CORE_DIR}/docs/user-guide/${CORE_NAME}.pdf .ipf/${CORE_NAME}.pdf
 	rm -rf *.anno.json
 
 # Run the scalafix and scalafmt linters
@@ -138,22 +152,22 @@ ipf:
 lint: 
 	rm -rf lint.rpt
 	@echo Running scalafmt checks
-	$(SBT) "scalafmtCheck" | tee -a lint.rpt
+	sbt "scalafmtCheck" | tee -a lint.rpt
 	@echo Running scalafix lint checks
-	$(SBT) "Compile/scalafixAll --check" "Test/scalafixAll --check" | tee -a lint.rpt
+	sbt "Compile/scalafixAll --check" "Test/scalafixAll --check" | tee -a lint.rpt
 
 # Publish locally
 .PHONY: publish
 publish: 
 	@echo Publishing libraries locally
-	$(SBT) "project core" publishLocal | tee docs/publish.rpt
+	sbt "project core" publishLocal | tee docs/publish.rpt
 
 # Run the tests
 .PHONY: test
 test:
 	@echo Running tests
 	mkdir -p ${CORE_DIR}/generated
-	$(SBT) "project core" test | tee ${CORE_DIR}/generated/test.rpt
+	sbt "project core" test | tee ${CORE_DIR}/generated/test.rpt
 	rm -rf *anno.json
 
 # Generate Verilog and synthesize
@@ -161,7 +175,7 @@ test:
 verilog:
 	@echo Generate Verilog for synthesis
 	mkdir -p ${CORE_DIR}/generated
-	$(SBT) "project core" run | tee ${CORE_DIR}/generated/verilog.rpt
+	sbt "project core" run | tee ${CORE_DIR}/generated/verilog.rpt
 	rm -rf *anno.json
 
 # Run synthesis on generated Verilog; generate timing and area reports

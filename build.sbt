@@ -1,18 +1,19 @@
-// chiselWare versions
-val coreVersion = "0.8.0"
-val chiselWareVersion = "0.8.0"
-val chiselWareScalaVersion = "2.13.13"
+// -- Core Configuration ------------------------------------------------------
+val coreNameLc = "dff"
+val coreVersion = "0.1.0"
+val orgId = "00"
+val teamId = "000"
+val chiselWareVersion = "0.8.0" // chiselWare platform version used (Maven)
+// -- End Core Configuration -- do not modify below this line ------------------
 
-// chisel versions
 val chiselVersion = "5.3.0"
 val chiselTestVer = "5.0.2"
-
-// scala versions
 val scalafmtVersion = "2.5.0"
 val scalaTestVer = "3.2.18"
+val chiselWareScalaVersion = "2.13.13"
 
-ThisBuild / version := coreVersion
 ThisBuild / scalaVersion := chiselWareScalaVersion
+ThisBuild / version := coreVersion
 ThisBuild / organization := "org.chiselware"
 ThisBuild / organizationName := "Chiselware"
 
@@ -31,10 +32,6 @@ inThisBuild(
     semanticdbVersion := scalafixSemanticdb.revision
   )
 )
-ThisBuild / scalafixDependencies +=
-  "org.chiselware" %% "chiselware-scalafix-rules" % chiselWareVersion
-
-// pull from local temporarily
 ThisBuild / scalafixDependencies +=
   "org.chiselware" %% "chiselware-scalafix-rules" % chiselWareVersion
 
@@ -71,15 +68,16 @@ lazy val root = (project in file("."))
   )
 
 lazy val core = project
-  .in(file("modules/dff"))
+  .in(file(s"modules/$coreNameLc"))
   .settings(
-    name := "chiselware-core-dff",
+    name := s"chiselware-core-$coreNameLc",
     coverageDataDir := target.value / "../generated/scalaCoverage",
     coverageFailOnMinimum := true,
     coverageMinimumStmtTotal := 90,
     coverageMinimumBranchTotal := 95,
     publish / skip := true, // no API for cores
-    Compile / mainClass := Some("org.chiselware.cores.o00.t000.dff.Main"),
+    Compile / mainClass :=
+      Some(s"org.chiselware.cores.o$orgId.t$teamId.$coreNameLc.Main"),
     Compile / doc / skip := false
   )
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
