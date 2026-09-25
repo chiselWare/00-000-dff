@@ -1,6 +1,13 @@
 # Changelog
+## [0.8.4] - 2026-xx-xx
+### Added
+- 
+### Fixed
+- 
+### Changed
+- Changed self-hosted runner to GitHub-hosted runner with container
 
-## [0.8.3] - yyyy-mm-dd
+## [0.8.3] - 2026-07-26
 ### Added
 - Dev Container
 ### Fixed
