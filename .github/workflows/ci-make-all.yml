@@ -2,8 +2,8 @@ name: "regression (make all)"
 
 on:
   pull_request:
-    branches: [ staging ]
-    types: [ opened, synchronize, reopened, ready_for_review ]
+    branches: [staging]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 permissions:
@@ -11,7 +11,8 @@ permissions:
 
 # Cancel a superseded run when a developer pushes again to the same PR.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group:
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -19,5 +20,7 @@ jobs:
     # Skip draft PRs; manual dispatch always runs.
     # To enforce feature/* -> staging only, append:
     #   && startsWith(github.head_ref, 'feature/')
-    if: github.event_name == 'workflow_dispatch' || !github.event.pull_request.draft
-    uses: chiselWare/ci-workflows/.github/workflows/make-all.yml@ci-container
+    if:
+      github.event_name == 'workflow_dispatch' ||
+      !github.event.pull_request.draft
+    uses: chiselWare/ci-workflows/.github/workflows/make-all.yml@v0
