@@ -1,15 +1,26 @@
-name: "00-000-dff regression (make all)"
+name: "regression (make all)"
 
 on:
   pull_request:
-    branches: [ staging ]
+    branches: [staging]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Cancel a superseded run when a developer pushes again to the same PR.
+concurrency:
+  group:
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   make-all:
-    uses: chiselWare/ci-workflows/.github/workflows/make-all.yml@v1
-    with:
-      module_name: "dff"
-      make_target: "all"
-      runner_labels: '["self-hosted","local-ci"]'
-    secrets: inherit
+    # Skip draft PRs; manual dispatch always runs.
+    # To enforce feature/* -> staging only, append:
+    #   && startsWith(github.head_ref, 'feature/')
+    if:
+      github.event_name == 'workflow_dispatch' ||
+      !github.event.pull_request.draft
+    uses: chiselWare/ci-workflows/.github/workflows/make-all.yml@v0
