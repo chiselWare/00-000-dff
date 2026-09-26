@@ -42,8 +42,7 @@ class Dff(p: DffParams) extends Module {
   val q = RegInit(0.U(p.width.W))
 
   when(io.enable) {
-    q := ~io.d
-//    q := io.d
+    q := io.d
   }
 
   io.q := q
