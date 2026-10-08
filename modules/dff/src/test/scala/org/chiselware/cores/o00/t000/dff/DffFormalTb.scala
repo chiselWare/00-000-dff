@@ -1,5 +1,5 @@
-// (c) <year> <your name or company>
-// This code is licensed under the <name of license> (see LICENSE.MD)
+// SPDX-FileCopyrightText: <COPYRIGHT HOLDER>
+// SPDX-License-Identifier: Apache-2.0
 
 package org.chiselware.cores.o00.t000.dff
 

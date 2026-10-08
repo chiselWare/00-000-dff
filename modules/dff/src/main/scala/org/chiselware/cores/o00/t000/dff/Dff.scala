@@ -1,5 +1,5 @@
-// (c) <year> <your name or company>
-// This code is licensed under the <name of license> (see LICENSE.MD)
+// SPDX-FileCopyrightText: <COPYRIGHT HOLDER>
+// SPDX-License-Identifier: Apache-2.0
 
 package org.chiselware.cores.o00.t000.dff
 
@@ -8,7 +8,13 @@ import chisel3._
 import org.chiselware.ipf.{ IpfJsonFile, ParamCli }
 import org.chiselware.syn.{ RunScriptFile, StaTclFile, YosysTclFile }
 
+object Dff {
+  def apply(params: DffParams): Dff = Module(new Dff(params))
+}
+
 /** A D-Flip-Flop with asynchronous reset
+  *
+  * <img src="Dff-blockdiagram.png" />
   *
   * @constructor
   *   create a new Dff
@@ -20,17 +26,7 @@ import org.chiselware.syn.{ RunScriptFile, StaTclFile, YosysTclFile }
   *
   * @see
   *   [[http://www.yourcompany.com]] for more information.
-  *
-  * <img src="doc/images/user-guide/dff-block-diagram.png" />
   */
-
-/** Companion object to allow factory method instantiation, such as myDff =
-  * Dff(width = 8)
-  */
-
-object Dff {
-  def apply(params: DffParams): Dff = Module(new Dff(params))
-}
 
 class Dff(p: DffParams) extends Module {
   val io = IO(new Bundle {

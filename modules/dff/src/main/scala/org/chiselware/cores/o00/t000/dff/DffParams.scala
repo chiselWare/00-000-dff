@@ -1,5 +1,5 @@
-// (c) <year> <your name or company>
-// This code is licensed under the <name of license> (see LICENSE.MD)
+// SPDX-FileCopyrightText: <COPYRIGHT HOLDER>
+// SPDX-License-Identifier: Apache-2.0
 
 package org.chiselware.cores.o00.t000.dff
 
@@ -59,9 +59,9 @@ object DffParams {
 
   // Package parameter names for import to IP Factory
   def fromMap(m: Map[String, String]): DffParams = {
-    val width = m.get("width").map(_.toInt).getOrElse(1)
-    // add all additional synthesis parameters here
-    DffParams(width = width) // extend with more params as needed
+    DffParams(
+      width = m("width").toInt
+    ) // extend with more params as needed
   }
 }
 

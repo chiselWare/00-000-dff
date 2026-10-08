@@ -78,6 +78,16 @@ lazy val core = project
     publish / skip := true, // no API for cores
     Compile / mainClass :=
       Some(s"org.chiselware.cores.o$orgId.t$teamId.$coreNameLc.Main"),
-    Compile / doc / skip := false
+    Compile / doc / skip := false,
+    Compile / doc := {
+      val out = (Compile / doc).value
+      val pkgDir =
+        out / "org" / "chiselware" / "cores" / s"o$orgId" / s"t$teamId" /
+          coreNameLc
+      val src = baseDirectory.value / "docs" / "user-guide" / "images"
+      if (src.exists)
+        IO.copyDirectory(src, pkgDir)
+      out
+    }
   )
   .settings(commonSettings)

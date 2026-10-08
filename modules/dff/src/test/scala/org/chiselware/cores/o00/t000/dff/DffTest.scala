@@ -1,5 +1,5 @@
-// (c) <year> <your name or company>
-// This code is licensed under the <name of license> (see LICENSE.MD)
+// SPDX-FileCopyrightText: <COPYRIGHT HOLDER>
+// SPDX-License-Identifier: Apache-2.0
 
 package org.chiselware.cores.o00.t000.dff
 
@@ -32,7 +32,10 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
   }
 
   /** Main test function executes one complete test for one configuration */
-  def main(configName: String, p: DffParams): Unit = {
+  def main(
+      configName: String,
+      p: DffParams
+    ): Unit = {
 
     behavior of s"Dff directed tests (config: $configName)"
 

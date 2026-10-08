@@ -1,0 +1,6 @@
+[ {
+  "name" : "width",
+  "type" : "field",
+  "value" : null,
+  "requirement" : "width must be greater than or equal 1"
+} ]

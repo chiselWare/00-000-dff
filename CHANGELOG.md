@@ -1,9 +1,16 @@
 # Changelog
-## [0.8.4] - 2026-09-26
+## [0.8.5] - 2026-10-07
 ### Added
-- 
+- build.sbt to allow images in Scaladoc pages
 ### Fixed
-- 
+- Use variables for params in cov and ipf targets in Makefile
+- Update UG to use factory method as required
+- Fixed formatting on LICENSE.MD
+### Changed
+- Simplified fromMap code to remove trap for bad values; checking should be pushed to IPF code
+- Changed license header to use SPDX identifier
+
+## [0.8.4] - 2026-09-26
 ### Changed
 - Changed self-hosted runner to GitHub-hosted runner with container
 

@@ -2,6 +2,7 @@
 ORG_ID := "00"
 TEAM_ID := "000"
 CORE_NAME := "Dff"
+IPF_PARAMS := "width=8"
 # -- End Core Configuration -- do not modify below this line ------------------
 
 MAKEFLAGS += --silent
@@ -14,7 +15,7 @@ TC_DIR := "${GEN_DIR}/synTestCases"
 
 # Some gymnastics are required to get Firefox to behave nicely in both native
 # Linux and containerized Linux environments through the use of profiles. Also
-# included in the profiles are switches to prevent new user startup tabs.
+# included in the profileX are switches to prevent new user startup tabs.
 FIREFOX_PROFILE_BASE = .firefox-profiles
 FIREFOX = bash -c 'mkdir -p $(FIREFOX_PROFILE_BASE)/ff-$$$$ && \
     echo "user_pref(\"browser.startup.homepage_override.mstone\", \"ignore\");" > $(FIREFOX_PROFILE_BASE)/ff-$$$$/user.js && \
@@ -118,7 +119,7 @@ cov:
 	"project core" \
 	test \
 	run  \
-	"runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(width=1)'" \
+	"runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(${IPF_PARAMS})'" \
 	coverageReport | tee ${CORE_DIR}/generated/test.rpt
 	rm -rf *.anno.json
 	${FIREFOX} ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html 2>/dev/null &
@@ -128,7 +129,7 @@ cov:
 docs:
 	@echo Building API docs
 	sbt "project core" doc | tee docs/doc.rpt
-	${FIREFOX} ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o${ORG_ID}/t${TEAM_ID}/${CORE_NAME_LC}/index.html 2>/dev/null &
+	${FIREFOX} ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o${ORG_ID}/t${TEAM_ID}/${CORE_NAME_LC}/${CORE_NAME}.html 2>/dev/null &
 
 	@echo Building User Guide
 	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE_NAME}.tex 
@@ -142,7 +143,7 @@ docs:
 ipf:
 # Generate IP Factory deliverables
 	@echo Building artifacts for the IP Factory to download
-	sbt "project core" "runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(width=8)'" | tee -a ipf.rpt 
+	sbt "project core" "runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(${IPF_PARAMS})'" | tee -a ipf.rpt 
 # Copy the User Guide to the .ipf/ directory for upload
 	cp -f ${CORE_DIR}/docs/user-guide/${CORE_NAME}.pdf .ipf/${CORE_NAME}.pdf
 	rm -rf *.anno.json
