@@ -3,6 +3,7 @@
 
 # Chisel
 lint.rpt
+conformance.rpt
 error.rpt
 ipf.rpt
 project/*

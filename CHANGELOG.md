@@ -1,4 +1,12 @@
 # Changelog
+## [0.9.0] - 2026-xx-xx
+### Added
+-  Add 'conformance' target to Makefile
+### Fixed
+- scalafix.conf, scalafix-test.conf, scalafmt.conf updates to support CWS rules
+### Changed
+- Tweak to build.sbt and Makefile to support new 'conformance' make target
+
 ## [0.8.5] - 2026-10-07
 ### Added
 - build.sbt to allow images in Scaladoc pages
@@ -18,7 +26,7 @@
 ### Added
 - Dev Container
 ### Fixed
-- Typo is GitHub URL in User Guide
+- Typo is GitHub URL in User Guid<!--  -->e
 ### Changed
 - Improvements to build.sbt to reduce customizations
 - Improvements to Makefile reduce customizations

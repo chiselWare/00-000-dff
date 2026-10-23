@@ -3,13 +3,16 @@
 
 package org.chiselware.cores.o00.t000.dff
 
-import _root_.circt.stage.ChiselStage
 import chisel3._
+
+import _root_.circt.stage.ChiselStage
 import org.chiselware.ipf.{ IpfJsonFile, ParamCli }
 import org.chiselware.syn.{ RunScriptFile, StaTclFile, YosysTclFile }
 
 object Dff {
+
   def apply(params: DffParams): Dff = Module(new Dff(params))
+
 }
 
 /** A D-Flip-Flop with asynchronous reset
@@ -29,6 +32,7 @@ object Dff {
   */
 
 class Dff(p: DffParams) extends Module {
+
   val io = IO(new Bundle {
     val d = Input(UInt(p.width.W))
     val q = Output(UInt(p.width.W))
@@ -42,12 +46,14 @@ class Dff(p: DffParams) extends Module {
   }
 
   io.q := q
+
 }
 
 /** Generate Verilog and related collateral for each configuration to be used as
   * part of the regression framework.
   */
 object Main extends App {
+
   val coreDir = s"modules/${DffParams.MainClassName.toLowerCase()}"
 
   DffParams.synConfigMap.foreach { case (configName, configParams) =>
@@ -56,34 +62,35 @@ object Main extends App {
       "--disable-all-randomization",
       "--strip-debug-info",
       "--split-verilog",
-      s"-o=${coreDir}/generated/synTestCases/$configName"
+      s"-o=${coreDir}/generated/synTestCases/$configName",
     )
     println()
     println(s"Generating Verilog for config: $configName")
     ChiselStage.emitSystemVerilog(
       gen = new Dff(p = configParams),
-      firtoolOpts = myOpts
+      firtoolOpts = myOpts,
     )
 
     // Generate synthesis files and scripts
     SdcFile.create(
       p = configParams,
-      sdcFilePath = s"${coreDir}/generated/synTestCases/$configName"
+      sdcFilePath = s"${coreDir}/generated/synTestCases/$configName",
     )
     YosysTclFile.create(
       mainClassName = DffParams.MainClassName,
-      synTestDir = s"${coreDir}/generated/synTestCases/$configName"
+      synTestDir = s"${coreDir}/generated/synTestCases/$configName",
     )
     StaTclFile.create(
       mainClassName = DffParams.MainClassName,
-      synTestDir = s"${coreDir}/generated/synTestCases/$configName"
+      synTestDir = s"${coreDir}/generated/synTestCases/$configName",
     )
     RunScriptFile.create(
       mainClassName = DffParams.MainClassName,
       configs = DffParams.synConfigs,
-      runDir = s"${coreDir}/generated/synTestCases"
+      runDir = s"${coreDir}/generated/synTestCases",
     )
   }
+
 }
 
 /** Generate artifacts for the IP Factory to download upon a user request.
@@ -100,7 +107,9 @@ object Main extends App {
   * ```
   */
 object GenVerWithParamCli extends App {
+
   val p = ParamCli.parseParams(args)
+
   val params = DffParams.fromMap(p)
 
   ChiselStage.emitSystemVerilog(
@@ -110,18 +119,18 @@ object GenVerWithParamCli extends App {
       "--disable-all-randomization",
       "--strip-debug-info",
       "--split-verilog",
-      s"-o=.ipf"
-    )
+      s"-o=.ipf",
+    ),
   )
 
   SdcFile.create(
     p = params,
-    sdcFilePath = ".ipf"
+    sdcFilePath = ".ipf",
   )
 
   IpfJsonFile.create(
     p = IpfParamsMap.params,
-    jsonFilePath = s".ipf/${DffParams.MainClassName}.json"
+    jsonFilePath = s".ipf/${DffParams.MainClassName}.json",
   )
 
 }

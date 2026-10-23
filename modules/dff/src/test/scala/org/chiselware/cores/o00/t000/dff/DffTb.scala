@@ -12,6 +12,7 @@ import chisel3._
   */
 
 class DffTb(p: DffParams) extends Module {
+
   val io = IO(new Bundle {
     val in = Input(UInt(p.width.W))
     val out = Output(UInt(p.width.W))

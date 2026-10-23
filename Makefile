@@ -15,7 +15,7 @@ TC_DIR := "${GEN_DIR}/synTestCases"
 
 # Some gymnastics are required to get Firefox to behave nicely in both native
 # Linux and containerized Linux environments through the use of profiles. Also
-# included in the profileX are switches to prevent new user startup tabs.
+# included in the profiles are switches to prevent new user startup tabs.
 FIREFOX_PROFILE_BASE = .firefox-profiles
 FIREFOX = bash -c 'mkdir -p $(FIREFOX_PROFILE_BASE)/ff-$$$$ && \
     echo "user_pref(\"browser.startup.homepage_override.mstone\", \"ignore\");" > $(FIREFOX_PROFILE_BASE)/ff-$$$$/user.js && \
@@ -28,13 +28,34 @@ list:
 	@grep '^[^#[:space:]].*:' Makefile
 
 .PHONY: all
-all: clean lint publish cov yosys docs ipf check
+all: clean conformance lint publish cov yosys docs ipf check
+
+# Runs the checker version that matches chiselWareVersion in build.sbt, so each
+# core is checked against the template it was built from. Uses Scala CLI (in the
+# chiselware/dev-full image) to fetch the checker from Maven and run it; no
+# sources are compiled, and --server=false skips starting a compile server.
+
+CHISELWARE_VERSION := $(shell sed -n 's/^val chiselWareVersion *= *"\([^"]*\)".*/\1/p' build.sbt)
+CONFORMANCE_GROUP  := org.chiselware
+CONFORMANCE_DEP    := $(CONFORMANCE_GROUP):chiselware-conformance_2.13:$(CHISELWARE_VERSION)
+
+.PHONY: conformance
+conformance:
+	@echo Running template conformance tests
+	@scala-cli run --server=false -S 2.13 \
+		--dep $(CONFORMANCE_DEP) \
+		-e 'object ConformanceLauncher' \
+		-M org.chiselware.conformance.Main \
+		-- $(CURDIR) | tee conformance.rpt
 
 .PHONY: check
 check: 
 	@echo 
 	@echo Checking for errors
 	rm -rf ${ERROR_REP}
+# conformance checks
+	grep -Hn -E "FAIL" conformance.rpt | tee -a ${ERROR_REP} 
+
 # lint (scalafix) and format (scalafmt) checks
 	grep -Hn -E "\[error] scalafmt" lint.rpt | tee -a ${ERROR_REP} 
 	grep -Hn -E "\[error] ---" lint.rpt | tee -a ${ERROR_REP} 
@@ -97,6 +118,7 @@ clean:
 	rm -rf docs/*.rpt
 	rm -rf ipf.rpt
 	rm -rf .ipf/*
+	rm -rf conformance.rpt
 	rm -rf lint.rpt
 	rm -rf error.rpt
 	rm -rf target
@@ -153,7 +175,8 @@ ipf:
 lint: 
 	rm -rf lint.rpt
 	@echo Running scalafmt checks
-	sbt "scalafmtCheck" | tee -a lint.rpt
+	sbt "scalafmtCheckAll" | tee -a lint.rpt
+	sbt "scalafmtSbtCheck" | tee -a lint.rpt
 	@echo Running scalafix lint checks
 	sbt "Compile/scalafixAll --check" "Test/scalafixAll --check" | tee -a lint.rpt
 

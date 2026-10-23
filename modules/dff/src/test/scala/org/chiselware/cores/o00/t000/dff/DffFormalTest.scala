@@ -4,7 +4,8 @@
 package org.chiselware.cores.o00.t000.dff
 
 import chiseltest._
-import chiseltest.formal._
+
+import chiseltest.formal.{ BoundedCheck, Formal }
 import firrtl2.options.TargetDirAnnotation
 import org.scalatest.Tag
 import org.scalatest.flatspec.AnyFlatSpec
@@ -29,15 +30,14 @@ class DffFormalTest extends AnyFlatSpec with ChiselScalatestTester with Formal {
 
   behavior of "Dff formal"
 
-  for ((configName, config) <- DffParams.simConfigMap) {
-    it should s"pass all formal properties ($configName)" taggedAs FormalTest in {
+  for ((configName, config) <- DffParams.simConfigMap)
+    it should s"pass all formal properties ($configName)" taggedAs FormalTest in
       verify(
         new DffFormalTb(config),
         Seq(
           bound,
-          TargetDirAnnotation(s"modules/dff/generated/formal/$configName")
-        )
+          TargetDirAnnotation(s"modules/dff/generated/formal/$configName"),
+        ),
       )
-    }
-  }
+
 }

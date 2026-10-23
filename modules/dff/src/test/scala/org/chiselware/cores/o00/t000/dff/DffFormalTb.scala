@@ -4,7 +4,8 @@
 package org.chiselware.cores.o00.t000.dff
 
 import chisel3._
-import chiseltest.formal._
+
+import chiseltest.formal.{ fell, past, rose, stable }
 
 /** Formal testbench for Dff.
   *
@@ -37,7 +38,9 @@ class DffFormalTb(p: DffParams) extends Module {
   })
 
   val dut = Module(new Dff(p))
+
   dut.io.d := io.d
+
   dut.io.enable := io.enable
 
   // ---- assumptions ------------------------------------------------------
@@ -56,7 +59,7 @@ class DffFormalTb(p: DffParams) extends Module {
   when(past(io.enable) && !past(reset.asBool)) {
     assert(
       dut.io.q === past(io.d),
-      "output must capture input when enable is high"
+      "output must capture input when enable is high",
     )
   }
 
@@ -72,7 +75,7 @@ class DffFormalTb(p: DffParams) extends Module {
   when(!past(io.enable) && !past(reset.asBool)) {
     assert(
       stable(dut.io.q),
-      "output must be stable when enable is low (stable)"
+      "output must be stable when enable is low (stable)",
     )
   }
 
@@ -82,7 +85,7 @@ class DffFormalTb(p: DffParams) extends Module {
   when(past(rose(io.enable)) && !past(reset.asBool)) {
     assert(
       dut.io.q === past(io.d),
-      "output must update the cycle after enable rises"
+      "output must update the cycle after enable rises",
     )
   }
 
@@ -90,7 +93,7 @@ class DffFormalTb(p: DffParams) extends Module {
   when(past(fell(io.enable)) && !past(reset.asBool)) {
     assert(
       dut.io.q === past(dut.io.q),
-      "output must hold the cycle after enable falls"
+      "output must hold the cycle after enable falls",
     )
   }
 

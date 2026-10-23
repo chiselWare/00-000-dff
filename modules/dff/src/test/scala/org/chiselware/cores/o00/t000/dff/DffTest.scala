@@ -5,28 +5,29 @@ package org.chiselware.cores.o00.t000.dff
 
 import chisel3._
 import chiseltest._
+
 import firrtl2.options.TargetDirAnnotation
+import java.io.File
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-
-import java.io.File
 
 class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
 
   // Execute the main test for each configuration
-  for ((configName, config) <- DffParams.simConfigMap) {
+  for ((configName, config) <- DffParams.simConfigMap)
     main(configName = configName, p = config)
-  }
 
   val scalaCoverageDir = new File("generated/scalaCoverage")
+
   scalaCoverageDir.mkdir()
 
   // Test that illegal configuration combinations are caught
   behavior of "Configuration assertions"
+
   it should "throw an assertion when dataWidth parameter is less than 1" in {
     val widthErr = assertThrows[IllegalArgumentException] {
       DffParams(
-        width = 0
+        width = 0,
       )
     }
   }
@@ -34,7 +35,7 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
   /** Main test function executes one complete test for one configuration */
   def main(
       configName: String,
-      p: DffParams
+      p: DffParams,
     ): Unit = {
 
     behavior of s"Dff directed tests (config: $configName)"
@@ -45,10 +46,10 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
       VerilatorBackendAnnotation,
       // IcarusBackendAnnotation,
       // VcsBackendAnnotation,
-      TargetDirAnnotation("modules/dff/generated")
+      TargetDirAnnotation("modules/dff/generated"),
     )
 
-    it should "perform these tests successfully " in {
+    it should "perform these tests successfully " in
       test(new DffTb(p))
         .withAnnotations(annotationSeq = backendAnnotations) { dut =>
           dut.clock.setTimeout(0)
@@ -74,6 +75,6 @@ class DffTest extends AnyFlatSpec with Matchers with ChiselScalatestTester {
             dut.io.out.expect(myData)
           }
         }
-    }
   }
+
 }

@@ -3,9 +3,8 @@
 
 package org.chiselware.cores.o00.t000.dff
 
-import org.chiselware.ipf.{ FieldType, IpfParams }
-
 import java.io.{ File, PrintWriter }
+import org.chiselware.ipf.{ FieldType, IpfParams }
 import scala.collection.mutable.LinkedHashMap
 
 /** Default parameter settings for Dff
@@ -19,10 +18,11 @@ import scala.collection.mutable.LinkedHashMap
   * @see
   *   [[http://www.mycompany.com]] for more information
   */
-case class DffParams(
-    width: Int = 1) {
+case class DffParams(width: Int = 1) {
   val widthMsg = "width must be greater than or equal 1"
+
   require(width >= 1, widthMsg)
+
 }
 
 /** Define a companion object to hold a Map of the configurations and the order
@@ -40,38 +40,38 @@ case class DffParams(
   */
 object DffParams {
   val MainClassName = "Dff"
+
   val simConfigMap = LinkedHashMap[String, DffParams](
-    "config8" -> DffParams(width = 8),
-    "config32" -> DffParams(width = 32),
-    "config64" -> DffParams(width = 64)
+    "simW8" -> DffParams(width = 8),
+    "simW32" -> DffParams(width = 32),
+    "simW64" -> DffParams(width = 64),
   )
 
   val synConfigMap = LinkedHashMap[String, DffParams](
-    "small_1" -> DffParams(width = 1),
-    "medium_64" -> DffParams(width = 64),
-    "large_128" -> DffParams(width = 128)
+    "synW1" -> DffParams(width = 1),
+    "synW64" -> DffParams(width = 64),
+    "synW128" -> DffParams(width = 128),
   )
 
   // Extract config names into a space-separated string
-  val synConfigs = DffParams.synConfigMap
-    .map { case (configName, config) => s"$configName" }
-    .mkString(" ")
+  val synConfigs = DffParams.synConfigMap.keys.mkString(" ")
 
   // Package parameter names for import to IP Factory
-  def fromMap(m: Map[String, String]): DffParams = {
+  def fromMap(m: Map[String, String]): DffParams =
     DffParams(
-      width = m("width").toInt
+      width = m("width").toInt,
     ) // extend with more params as needed
-  }
+
 }
 
 /** Customize this companion object with your port list and desired synthesis
   * contraints.
   */
 object SdcFile {
+
   def create(
       p: DffParams,
-      sdcFilePath: String
+      sdcFilePath: String,
     ): Unit = {
     // Default constraints, tighten or loosen as necessary
     val period = 5.000 // ns
@@ -105,15 +105,17 @@ object SdcFile {
 }
 
 object IpfParamsMap {
+
   val params = Map(
     "width" ->
       IpfParams(
         fieldType = FieldType.Field,
         pickList = List.empty,
-        message = Some(DffParams().widthMsg)
+        message = Some(DffParams().widthMsg),
         // add remaining parameters as needed, here are some examples
         // "useFifo" -> IpfParams(FieldType.Toggle, List.empty, None),
         // "cacheSize" -> IpfParams(FieldType.Pick, List("32", "64", "128"), None)
-      )
+      ),
   )
+
 }
