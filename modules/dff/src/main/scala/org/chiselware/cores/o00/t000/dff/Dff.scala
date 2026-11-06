@@ -6,8 +6,12 @@ package org.chiselware.cores.o00.t000.dff
 import chisel3._
 
 import _root_.circt.stage.ChiselStage
+import org.chiselware.BuildInfo.{
+  chiselWareVersion, coreVersion, spdxCopyrightText, spdxLicense,
+}
 import org.chiselware.ipf.{ IpfJsonFile, ParamCli }
 import org.chiselware.syn.{ RunScriptFile, StaTclFile, YosysTclFile }
+import org.chiselware.verilogheaders.VerilogHeader
 
 object Dff {
 
@@ -57,33 +61,47 @@ object Main extends App {
   val coreDir = s"modules/${DffParams.MainClassName.toLowerCase()}"
 
   DffParams.synConfigMap.foreach { case (configName, configParams) =>
-    val myOpts = Array(
-      "--lowering-options=disallowLocalVariables,disallowPackedArrays",
-      "--disable-all-randomization",
-      "--strip-debug-info",
-      "--split-verilog",
-      s"-o=${coreDir}/generated/synTestCases/$configName",
-    )
     println()
     println(s"Generating Verilog for config: $configName")
-    ChiselStage.emitSystemVerilog(
+    val outDir = s"$coreDir/generated/synTestCases/$configName"
+    ChiselStage.emitSystemVerilogFile(
       gen = new Dff(p = configParams),
-      firtoolOpts = myOpts,
+      args = Array("--target-dir", outDir, "--split-verilog"),
+      firtoolOpts = Array(
+        "--lowering-options=disallowLocalVariables,disallowPackedArrays",
+        "--disable-all-randomization",
+        "--strip-debug-info",
+      ),
     )
+
+    val prov = VerilogHeader.fromGit(
+      coreVersion = coreVersion,
+      cwVersion = chiselWareVersion,
+      copyrightText = spdxCopyrightText,
+      license = spdxLicense,
+    )
+
+    println(
+      s"Stamping generated code for config $configName with provenance data",
+    )
+    VerilogHeader.stamp(dir = java.nio.file.Paths.get(outDir), p = prov)
 
     // Generate synthesis files and scripts
     SdcFile.create(
       p = configParams,
       sdcFilePath = s"${coreDir}/generated/synTestCases/$configName",
     )
+
     YosysTclFile.create(
       mainClassName = DffParams.MainClassName,
       synTestDir = s"${coreDir}/generated/synTestCases/$configName",
     )
+
     StaTclFile.create(
       mainClassName = DffParams.MainClassName,
       synTestDir = s"${coreDir}/generated/synTestCases/$configName",
     )
+
     RunScriptFile.create(
       mainClassName = DffParams.MainClassName,
       configs = DffParams.synConfigs,
@@ -109,19 +127,29 @@ object Main extends App {
 object GenVerWithParamCli extends App {
 
   val p = ParamCli.parseParams(args)
-
   val params = DffParams.fromMap(p)
+  val OutDir = ".ipf"
 
-  ChiselStage.emitSystemVerilog(
+  ChiselStage.emitSystemVerilogFile(
     new Dff(params),
+    args = Array("--target-dir", OutDir, "--split-verilog"),
     firtoolOpts = Array(
       "--lowering-options=disallowLocalVariables,disallowPackedArrays",
       "--disable-all-randomization",
       "--strip-debug-info",
-      "--split-verilog",
-      s"-o=.ipf",
+      s"-o=$OutDir",
     ),
   )
+
+  val prov = VerilogHeader.fromGit(
+    coreVersion = coreVersion,
+    cwVersion = chiselWareVersion,
+    copyrightText = spdxCopyrightText,
+    license = spdxLicense,
+  )
+
+  println(s"Stamping generated code with provenance data")
+  VerilogHeader.stamp(dir = java.nio.file.Paths.get(OutDir), p = prov)
 
   SdcFile.create(
     p = params,

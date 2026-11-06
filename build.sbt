@@ -1,11 +1,13 @@
-// -- Core Configuration
+//════ Core Configuration ══════════════════════════════════════════════════════
 val coreNameLc = "dff"
 val coreVersion = "1.0.0"
 val orgId = "00"
 val teamId = "000"
-val chiselWareVersion = "0.9.0" // chiselWare platform version used (Maven)
-// -- End Core Configuration
+val chiselWareVersion = "0.9.1" // chiselWare platform version used (from Maven)
+val spdxCopyrightText = Seq("<COPYRIGHT HOLDER>") // add as many as needed
+//════ End Core Configuration -- do not modify below this line ═════════════════
 
+val spdxLicense = "Apache-2.0"
 val chiselVersion = "5.3.0"
 val chiselTestVer = "5.0.2"
 val scalafmtVersion = "2.5.0"
@@ -49,6 +51,7 @@ lazy val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % scalaTestVer % Test,
     "org.chiselware" %% "chiselware-syn" % chiselWareVersion,
     "org.chiselware" %% "chiselware-ipf" % chiselWareVersion,
+    "org.chiselware" %% "verilogheaders" % chiselWareVersion,
   ),
   scalacOptions ++= Seq(
     "-language:reflectiveCalls",
@@ -92,5 +95,28 @@ lazy val core = project
         IO.copyDirectory(src, pkgDir)
       out
     },
+    // Generate BuildInfo so these values are defined only once
+    Compile / sourceGenerators += Def.task {
+      // Turn a Scala string into a Scala string literal: abc -> "abc"
+      def lit(s: String) =
+        "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+      val holders = spdxCopyrightText.map(lit).mkString(", ")
+
+      val f = (Compile / sourceManaged).value / "org" / "chiselware" /
+        "BuildInfo.scala"
+      IO.write(
+        f,
+        s"""package org.chiselware
+       |object BuildInfo {
+       |  val coreVersion       = ${lit(version.value)}
+       |  val chiselWareVersion = ${lit(chiselWareVersion)}
+       |  val spdxCopyrightText = Seq($holders)
+       |  val spdxLicense       = ${lit(spdxLicense)}
+       |}
+       |""".stripMargin,
+      )
+      Seq(f)
+    }.taskValue,
   )
   .settings(commonSettings)

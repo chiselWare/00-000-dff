@@ -13,9 +13,10 @@ modules/*/generated/*
 modules/*/target/*
 modules/*/.scala-build/*
 target/*
-./ipf/*
-!./ipf.json
-!./ipf.pdf
+.ipf/*
+!./ipf/*.json
+./ipf/*.anno.json
+!./ipf/*.pdf
 .firefox-profiles
 
 # Visual Studio

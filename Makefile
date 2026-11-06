@@ -1,9 +1,9 @@
-# -- Core Configuration ------------------------------------------------------
+#════ Core Configuration ══════════════════════════════════════════════════════
 ORG_ID := "00"
 TEAM_ID := "000"
 CORE_NAME := "Dff"
 IPF_PARAMS := "width=8"
-# -- End Core Configuration -- do not modify below this line ------------------
+#════ End Core Configuration -- do not modify below this line ═════════════════
 
 MAKEFLAGS += --silent
 SHELL := /bin/bash
@@ -53,6 +53,7 @@ check:
 	@echo 
 	@echo Checking for errors
 	rm -rf ${ERROR_REP}
+
 # conformance checks
 	grep -Hn -E "FAIL" conformance.rpt | tee -a ${ERROR_REP} 
 
@@ -143,7 +144,6 @@ cov:
 	run  \
 	"runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(${IPF_PARAMS})'" \
 	coverageReport | tee ${CORE_DIR}/generated/test.rpt
-	rm -rf *.anno.json
 	${FIREFOX} ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html 2>/dev/null &
 
 # Generate the documentation
@@ -168,7 +168,6 @@ ipf:
 	sbt "project core" "runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(${IPF_PARAMS})'" | tee -a ipf.rpt 
 # Copy the User Guide to the .ipf/ directory for upload
 	cp -f ${CORE_DIR}/docs/user-guide/${CORE_NAME}.pdf .ipf/${CORE_NAME}.pdf
-	rm -rf *.anno.json
 
 # Run the scalafix and scalafmt linters
 .PHONY: lint
@@ -192,7 +191,6 @@ test:
 	@echo Running tests
 	mkdir -p ${CORE_DIR}/generated
 	sbt "project core" test | tee ${CORE_DIR}/generated/test.rpt
-	rm -rf *anno.json
 
 # Generate Verilog and synthesize
 .PHONY: verilog
@@ -200,7 +198,6 @@ verilog:
 	@echo Generate Verilog for synthesis
 	mkdir -p ${CORE_DIR}/generated
 	sbt "project core" run | tee ${CORE_DIR}/generated/verilog.rpt
-	rm -rf *anno.json
 
 # Run synthesis on generated Verilog; generate timing and area reports
 .PHONY: yosys
