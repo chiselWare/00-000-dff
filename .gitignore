@@ -14,9 +14,9 @@ modules/*/target/*
 modules/*/.scala-build/*
 target/*
 .ipf/*
-!./ipf/*.json
-./ipf/*.anno.json
-!./ipf/*.pdf
+!.ipf/*.json
+.ipf/*.anno.json
+!.ipf/*.pdf
 .firefox-profiles
 
 # Visual Studio

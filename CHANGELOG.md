@@ -1,4 +1,11 @@
 # Changelog
+## [0.9.3] - 2026-11-07
+### Added
+-  
+### Fixed
+- Corrected issue with dirty commit message in Verilog headers
+### Changed
+- 
 ## [0.9.2] - 2026-11-06
 ### Added
 -  

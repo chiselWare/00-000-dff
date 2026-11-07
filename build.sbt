@@ -84,6 +84,8 @@ lazy val core = project
     publish / skip := true, // no API for cores
     Compile / mainClass :=
       Some(s"org.chiselware.cores.o$orgId.t$teamId.$coreNameLc.Main"),
+    // Binaries only on Maven: Central, so publish an empty jar only
+    Compile / packageSrc / mappings := Seq.empty,
     Compile / doc / skip := false,
     Compile / doc := {
       val out = (Compile / doc).value

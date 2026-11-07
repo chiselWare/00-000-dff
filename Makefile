@@ -22,6 +22,13 @@ FIREFOX = bash -c 'mkdir -p $(FIREFOX_PROFILE_BASE)/ff-$$$$ && \
     echo "user_pref(\"datareporting.policy.dataSubmissionPolicyBypassNotification\", true);" >> $(FIREFOX_PROFILE_BASE)/ff-$$$$/user.js && \
     firefox --no-remote --profile $(FIREFOX_PROFILE_BASE)/ff-$$$$ "$$1" 2>/dev/null &' --
 
+# Insure PDF dates are tied to GitHub status, not build time
+SOURCE_DATE_EPOCH := $(shell git log -1 --format=%ct 2>/dev/null)
+ifneq ($(SOURCE_DATE_EPOCH),)
+export SOURCE_DATE_EPOCH
+export FORCE_SOURCE_DATE := 1
+endif
+
 # Run everything and scan for errors
 .PHONY: list
 list:
@@ -149,6 +156,7 @@ cov:
 # Generate the documentation
 .PHONY: docs
 docs:
+ # Reproducible PDF output: datasheet timestamps follow the commit, not the build time
 	@echo Building API docs
 	sbt "project core" doc | tee docs/doc.rpt
 	${FIREFOX} ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o${ORG_ID}/t${TEAM_ID}/${CORE_NAME_LC}/${CORE_NAME}.html 2>/dev/null &
