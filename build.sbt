@@ -3,7 +3,8 @@ val coreNameLc = "dff"
 val coreVersion = "1.0.0"
 val orgId = "00"
 val teamId = "000"
-val chiselWareVersion = "0.9.2" // chiselWare platform version used (from Maven)
+
+val chiselWareVersion = "0.9.3"
 val spdxCopyrightText = Seq("<COPYRIGHT HOLDER>") // add as many as needed
 //════ End Core Configuration -- do not modify below this line ═════════════════
 
