@@ -23,7 +23,7 @@ FIREFOX = bash -c 'mkdir -p $(FIREFOX_PROFILE_BASE)/ff-$$$$ && \
     firefox --no-remote --profile $(FIREFOX_PROFILE_BASE)/ff-$$$$ "$$1" 2>/dev/null &' --
 
 # Insure PDF dates are tied to GitHub status, not build time
-SOURCE_DATE_EPOCH := $(shell git log -1 --format=%ct 2>/dev/null)
+SOURCE_DATE_EPOCH := $(shell git log -1 --format=%ct -- . ':(exclude).ipf' ':(glob,exclude)**/docs/**/*.pdf' 2>/dev/null)
 ifneq ($(SOURCE_DATE_EPOCH),)
 export SOURCE_DATE_EPOCH
 export FORCE_SOURCE_DATE := 1
