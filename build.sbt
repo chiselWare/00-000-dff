@@ -3,7 +3,7 @@ val coreNameLc = "dff"
 val coreVersion = "1.0.0"
 val orgId = "00"
 val teamId = "000"
-val chiselWareVersion = "0.9.1" // chiselWare platform version used (from Maven)
+val chiselWareVersion = "0.9.2" // chiselWare platform version used (from Maven)
 val spdxCopyrightText = Seq("<COPYRIGHT HOLDER>") // add as many as needed
 //════ End Core Configuration -- do not modify below this line ═════════════════
 
@@ -51,7 +51,7 @@ lazy val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % scalaTestVer % Test,
     "org.chiselware" %% "chiselware-syn" % chiselWareVersion,
     "org.chiselware" %% "chiselware-ipf" % chiselWareVersion,
-    "org.chiselware" %% "verilogheaders" % chiselWareVersion,
+    "org.chiselware" %% "chiselware-verilogheaders" % chiselWareVersion,
   ),
   scalacOptions ++= Seq(
     "-language:reflectiveCalls",

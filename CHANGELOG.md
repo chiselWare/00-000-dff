@@ -1,5 +1,13 @@
 # Changelog
-## [0.9.0] - 2026-xx-xx
+## [0.9.2] - 2026-11-06
+### Added
+-  
+### Fixed
+- Corrected build.sbt to point at correct verilogHeaders package in Maven
+### Changed
+- 
+
+## [0.9.1] - 2026-11-06
 ### Added
 -  Add 'conformance' target to Makefile
 ### Fixed
