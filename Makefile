@@ -38,7 +38,7 @@ version.tex: FORCE
 	@printf '\\newcommand{\\cwversion}{%s}\n\\newcommand{\\cwdate}{%s}\n' \
      "$(VERSION)" "$(DOCDATE)" > $@
 
-+FORCE:
+FORCE:
 $(DOC_DIR)/version.tex: FORCE
 	@printf '\\newcommand{\\cwversion}{%s}\n\\newcommand{\\cwdate}{%s}\n' \
      "$(VERSION)" "$(DOCDATE)" > $@
@@ -169,8 +169,8 @@ cov:
 
 # Generate the documentation
 
-.PHONY: pdf
-pdf:
+.PHONY: pdf 
+pdf: $(DOC_DIR)/version.tex
  # Datasheet timestamps follow the commit, not the build time
 	@echo Building User Guide
 	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE_NAME}.tex 
