@@ -61,8 +61,10 @@
 }
 
 % Substitute your authors and/or company name
-\author{}
-
+\author{Developer Names}
+\InputIfFileExists{version.tex}{}{%
+  \newcommand{\cwversion}{dev}\newcommand{\cwdate}{\today}}
+\date{Version \cwversion \\ \cwdate} % chktex 1
 \fancyhead[L]{Dff Users Guide}
 \fancyhead[R]{\leftmark}
 % Substitute your copyright holder here

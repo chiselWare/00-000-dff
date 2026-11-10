@@ -1,4 +1,20 @@
 # Changelog
+## [0.9.5] - 2026-11-07
+### Added
+- Automatically add version to user guide title page associated with a GitHub commit 
+### Fixed
+- 
+### Changed
+- 
+
+## [0.9.4] - 2026-11-07
+### Added
+-  
+### Fixed
+- 
+### Changed
+- Align to chiselWare 0.9.4 infrastructure changes
+
 ## [0.9.3] - 2026-11-07
 ### Added
 -  
@@ -6,6 +22,7 @@
 - Corrected issue with dirty commit message in Verilog headers
 ### Changed
 - 
+
 ## [0.9.2] - 2026-11-06
 ### Added
 -  

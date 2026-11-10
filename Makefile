@@ -24,8 +24,7 @@ FIREFOX = bash -c 'mkdir -p $(FIREFOX_PROFILE_BASE)/ff-$$$$ && \
     firefox --no-remote --profile $(FIREFOX_PROFILE_BASE)/ff-$$$$ "$$1" 2>/dev/null &' --
 
 # Insure PDF dates are tied to GitHub status, not build time
-SOURCE_DATE_EPOCH := $(shell git log -1 --format=%ct -- . ':(exclude).ipf' ':(glob,exclude)**/docs/**/*.pdf' 2>/dev/nul
-l)
+SOURCE_DATE_EPOCH := $(shell git log -1 --format=%ct -- . ':(exclude).ipf' ':(glob,exclude)**/docs/**/*.pdf' 2>/dev/null)
 ifneq ($(SOURCE_DATE_EPOCH),)
 export SOURCE_DATE_EPOCH
 export FORCE_SOURCE_DATE := 1
@@ -36,13 +35,13 @@ VERSION := $(shell git describe --tags --always --dirty)
 DOCDATE := $(shell git log -1 --format=%cd --date=format:'%B %-d, %Y')
 
 version.tex: FORCE
-       @printf '\\newcommand{\\cwversion}{%s}\n\\newcommand{\\cwdate}{%s}\n' \
-         "$(VERSION)" "$(DOCDATE)" > $@
+	@printf '\\newcommand{\\cwversion}{%s}\n\\newcommand{\\cwdate}{%s}\n' \
+     "$(VERSION)" "$(DOCDATE)" > $@
 
 +FORCE:
 $(DOC_DIR)/version.tex: FORCE
-       @printf '\\newcommand{\\cwversion}{%s}\n\\newcommand{\\cwdate}{%s}\n' \
-         "$(VERSION)" "$(DOCDATE)" > $@
+	@printf '\\newcommand{\\cwversion}{%s}\n\\newcommand{\\cwdate}{%s}\n' \
+     "$(VERSION)" "$(DOCDATE)" > $@
 
 # Run everything and scan for errors
 .PHONY: list
