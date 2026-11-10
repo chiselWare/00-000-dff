@@ -154,23 +154,28 @@ cov:
 	${FIREFOX} ${CORE_DIR}/generated/scalaCoverage/scoverage-report/index.html 2>/dev/null &
 
 # Generate the documentation
-.PHONY: docs
-docs:
- # Reproducible PDF output: datasheet timestamps follow the commit, not the build time
-	@echo Building API docs
-	sbt "project core" doc | tee docs/doc.rpt
-	${FIREFOX} ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o${ORG_ID}/t${TEAM_ID}/${CORE_NAME_LC}/${CORE_NAME}.html 2>/dev/null &
 
+.PHONY: pdf
+pdf:
+ # Datasheet timestamps follow the commit, not the build time
 	@echo Building User Guide
 	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE_NAME}.tex 
 # Rerun to generate TOC
 	cd ${CORE_DIR}/docs/user-guide && pdflatex ${CORE_NAME}.tex | tee -a ../doc.rpt 
-# Clean up temp files
 	cd ${CORE_DIR}/docs/user-guide && rm *.aux *.toc *.out *.log
+
+.PHONY: api
+api:
+	@echo Building API docs
+	sbt "project core" doc | tee docs/doc.rpt
+
+.PHONY: docs
+docs: api pdf
+	${FIREFOX} ${CORE_DIR}/target/scala-2.13/api/org/chiselware/cores/o${ORG_ID}/t${TEAM_ID}/${CORE_NAME_LC}/${CORE_NAME}.html 2>/dev/null &
 	${FIREFOX} ${CORE_DIR}/docs/user-guide/${CORE_NAME}.pdf 2>/dev/null & 
 
 .PHONY: ipf 
-ipf:
+ipf: pdf
 # Generate IP Factory deliverables
 	@echo Building artifacts for the IP Factory to download
 	sbt "project core" "runMain org.chiselware.cores.o${ORG_ID}.t${TEAM_ID}.${CORE_NAME_LC}.GenVerWithParamCli -- --params='(${IPF_PARAMS})'" | tee -a ipf.rpt 

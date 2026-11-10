@@ -1,0 +1,32 @@
+name: Release user guide
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write # needed to create the release and upload the PDF
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags so git describe gives the tag
+
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended \
+            texlive-latex-extra texlive-fonts-recommended latexmk
+
+      - name: Build user guide
+        run: make pdf
+
+      - name: Attach PDF to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: modules/${{ env.CORE }}/docs/user-guide/${{ env.GUIDE }}.pdf
+          fail_on_unmatched_files: true

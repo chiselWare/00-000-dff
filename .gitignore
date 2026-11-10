@@ -9,6 +9,8 @@ ipf.rpt
 project/*
 !/project/build.properties
 !/project/plugins.sbt
+modules/*/docs/user-guide/*.pdf
+modules/*/docs/user-guide/version.tex
 modules/*/generated/*
 modules/*/target/*
 modules/*/.scala-build/*
