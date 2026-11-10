@@ -9,6 +9,7 @@ MAKEFLAGS += --silent
 SHELL := /bin/bash
 CORE_NAME_LC=$(shell echo $(CORE_NAME) | tr '[:upper:]' '[:lower:]')
 CORE_DIR := "modules/$(CORE_NAME_LC)"
+DOC_DIR := $(CORE_DIR)/docs/user-guide
 GEN_DIR := "${CORE_DIR}/generated"
 ERROR_REP := "error.rpt"
 TC_DIR := "${GEN_DIR}/synTestCases"
@@ -23,11 +24,25 @@ FIREFOX = bash -c 'mkdir -p $(FIREFOX_PROFILE_BASE)/ff-$$$$ && \
     firefox --no-remote --profile $(FIREFOX_PROFILE_BASE)/ff-$$$$ "$$1" 2>/dev/null &' --
 
 # Insure PDF dates are tied to GitHub status, not build time
-SOURCE_DATE_EPOCH := $(shell git log -1 --format=%ct -- . ':(exclude).ipf' ':(glob,exclude)**/docs/**/*.pdf' 2>/dev/null)
+SOURCE_DATE_EPOCH := $(shell git log -1 --format=%ct -- . ':(exclude).ipf' ':(glob,exclude)**/docs/**/*.pdf' 2>/dev/nul
+l)
 ifneq ($(SOURCE_DATE_EPOCH),)
 export SOURCE_DATE_EPOCH
 export FORCE_SOURCE_DATE := 1
 endif
+
+# Automatically imprint the date and version onto the User Guide title page
+VERSION := $(shell git describe --tags --always --dirty)
+DOCDATE := $(shell git log -1 --format=%cd --date=format:'%B %-d, %Y')
+
+version.tex: FORCE
+       @printf '\\newcommand{\\cwversion}{%s}\n\\newcommand{\\cwdate}{%s}\n' \
+         "$(VERSION)" "$(DOCDATE)" > $@
+
++FORCE:
+$(DOC_DIR)/version.tex: FORCE
+       @printf '\\newcommand{\\cwversion}{%s}\n\\newcommand{\\cwdate}{%s}\n' \
+         "$(VERSION)" "$(DOCDATE)" > $@
 
 # Run everything and scan for errors
 .PHONY: list
