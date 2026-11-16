@@ -1,11 +1,13 @@
 # Changelog
-## [0.9.5] - 2026-11-07
+## [0.9.5] - 2026-11-xx
 ### Added
-- Automatically add version to user guide title page associated with a GitHub commit 
+- Automatically add version to user guide title page derived from the GitHub release tag
+- Introduce CODEOWNERS file that requires chiselWare admin review before certification is final
 ### Fixed
 - 
 ### Changed
-- 
+- Eliminate customization of Makefile by extracting the parameters from build.sbt
+- Derive coreVersion from GitHub tag vs a customization of build.sbt
 
 ## [0.9.4] - 2026-11-07
 ### Added
@@ -13,7 +15,7 @@
 ### Fixed
 - 
 ### Changed
-- Align to chiselWare 0.9.4 infrastructure changes
+- Align to multiple changes in chiselWare 0.9.4 infrastructure 
 
 ## [0.9.3] - 2026-11-07
 ### Added

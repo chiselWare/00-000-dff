@@ -16,6 +16,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changelog-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate CHANGELOG version
+        run: |
+          VERSION=$(sed -n 's/^## \[\{0,1\}\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' CHANGELOG.md | head -1)
+          [ -n "$VERSION" ] || { echo "No version entry at top of CHANGELOG.md"; exit 1; }
+          LAST=$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null | sed 's/^v//')
+          if [ -n "$LAST" ]; then
+            HIGHER=$(printf '%s\n%s\n' "$LAST" "$VERSION" | sort -V | tail -1)
+            [ "$HIGHER" = "$VERSION" ] && [ "$VERSION" != "$LAST" ] \
+              || { echo "CHANGELOG version $VERSION must be greater than $LAST"; exit 1; }
+          fi
+          echo "Declared version: $VERSION"
+  branch-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require feature/* branch
+        run: |
+          case "$GITHUB_HEAD_REF" in
+            feature/*) ;;
+            *) echo "PRs to staging must come from feature/<name>"; exit 1 ;;
+          esac
+
   make-all:
     # Skip draft PRs; manual dispatch always runs.
     # To enforce feature/* -> staging only, append:

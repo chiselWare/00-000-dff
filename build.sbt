@@ -1,12 +1,22 @@
 //════ Core Configuration ══════════════════════════════════════════════════════
-val coreNameLc = "dff"
-val coreVersion = "1.0.0"
+val coreName = "Dff"
 val orgId = "00"
 val teamId = "000"
+val ipfParams = "width=8"
 
-val chiselWareVersion = "0.9.4"
+val chiselWareVersion = "0.9.5"
 val spdxCopyrightText = Seq("<COPYRIGHT HOLDER>") // add as many as needed
 //════ End Core Configuration -- do not modify below this line ═════════════════
+
+import scala.sys.process._
+
+val coreNameLc = coreName.toLowerCase
+
+// Version comes from git, the same source as the user guide cover
+val coreVersion: String =
+  scala.util.Try("git describe --tags --always --dirty".!!.trim)
+    .map(_.stripPrefix("v"))
+    .getOrElse("0.0.0-dev")
 
 val spdxLicense = "Apache-2.0"
 val chiselVersion = "5.3.0"

@@ -1,4 +1,4 @@
-name: Release user guide
+name: Release User Guide
 
 on:
   push:
@@ -15,6 +15,17 @@ jobs:
         with:
           fetch-depth: 0 # full history + tags so git describe gives the tag
 
+      - name: Verify certified tags
+        run: |
+          case "$GITHUB_REF_NAME" in
+            v0.*) exit 0 ;;   # pre-certification: no rules
+          esac
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main \
+            || { echo "Certified tag must be on main"; exit 1; }
+          VERSION=$(sed -n 's/^## \[\{0,1\}\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' CHANGELOG.md | head -1)
+          [ "$GITHUB_REF_NAME" = "v$VERSION" ] \
+            || { echo "Tag $GITHUB_REF_NAME does not match CHANGELOG version $VERSION"; exit 1; }
+
       - name: Install LaTeX
         run: |
           sudo apt-get update
@@ -24,6 +35,14 @@ jobs:
 
       - name: Build user guide
         run: make pdf
+      - name: Create release with PDF
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "modules/$CORE/docs/user-guide/$GUIDE.pdf" \
+            --title "$GITHUB_REF_NAME" \
+            --notes "chiselWare release $GITHUB_REF_NAME"
 
       - name: Attach PDF to release
         uses: softprops/action-gh-release@v2

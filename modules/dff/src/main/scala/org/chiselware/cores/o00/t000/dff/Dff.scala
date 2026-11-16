@@ -53,9 +53,6 @@ class Dff(p: DffParams) extends Module {
 
 }
 
-/** Generate Verilog and related collateral for each configuration to be used as
-  * part of the regression framework.
-  */
 object Main extends App {
 
   val coreDir = s"modules/${DffParams.MainClassName.toLowerCase()}"

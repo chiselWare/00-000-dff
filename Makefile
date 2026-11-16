@@ -1,13 +1,13 @@
-#════ Core Configuration ══════════════════════════════════════════════════════
-ORG_ID := "00"
-TEAM_ID := "000"
-CORE_NAME := "Dff"
-IPF_PARAMS := "width=8"
-#════ End Core Configuration -- do not modify below this line ═════════════════
-
-MAKEFLAGS += --silent
 SHELL := /bin/bash
-CORE_NAME_LC=$(shell echo $(CORE_NAME) | tr '[:upper:]' '[:lower:]')
+MAKEFLAGS += --silent
+
+# Extract parameters from build.sbt
+sbtval = $(shell sed -n 's/^val $(1) *= *"\([^"]*\)".*/\1/p' build.sbt)
+CORE_NAME  := $(call sbtval,coreName)
+CORE_NAME_LC    := $(shell echo '$(CORE_NAME)' | tr '[:upper:]' '[:lower:]')
+ORG_ID     := $(call sbtval,orgId)
+TEAM_ID    := $(call sbtval,teamId)
+IPF_PARAMS := $(call sbtval,ipfParams)
 CORE_DIR := "modules/$(CORE_NAME_LC)"
 DOC_DIR := $(CORE_DIR)/docs/user-guide
 GEN_DIR := "${CORE_DIR}/generated"

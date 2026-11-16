@@ -1,0 +1,17 @@
+name: "promotion check"
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  source-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require staging as source
+        run: |
+          [ "$GITHUB_HEAD_REF" = "staging" ] \
+            || { echo "Only staging may be promoted to main"; exit 1; }
