@@ -1,13 +1,14 @@
 # Changelog
-## [0.9.5] - 2026-11-xx
+## [0.9.5] - 2026-11-17
 ### Added
+- New `promote-ci` and `release-docs` workflow for promotion to main and User Guide tied to release tag
 - Automatically add version to user guide title page derived from the GitHub release tag
-- Introduce CODEOWNERS file that requires chiselWare admin review before certification is final
+- Introduce `CODEOWNERS` file that requires chiselWare admin review before certification is final
 ### Fixed
-- 
+- Several errors in `.gitignore`
 ### Changed
-- Eliminate customization of Makefile by extracting the parameters from build.sbt
-- Derive coreVersion from GitHub tag vs a customization of build.sbt
+- `Makefile` no longer requires customization, everything derived from `build.sbt`
+- Derive `coreVersion` from GitHub tag vs a customization of `build.sbt`
 
 ## [0.9.4] - 2026-11-07
 ### Added
