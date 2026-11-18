@@ -53,4 +53,4 @@ jobs:
           --title "${GITHUB_REF_NAME}" \
           --verify-tag \
           --generate-notes \
-          .ipf/${{ env.CORE }}.sv .ipf/${{ env.GUIDE}}.pdf
+          .ipf/$CORE.sv .ipf/$GUIDE.pdf
