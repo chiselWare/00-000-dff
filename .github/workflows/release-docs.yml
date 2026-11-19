@@ -10,10 +10,11 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    container: ghcr.io/chiselware/dev-full:0.8.0
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # full history + tags so git describe gives the tag
+          fetch-depth: 0
 
       - name: Verify certified tags
         run: |
@@ -25,13 +26,6 @@ jobs:
           VERSION=$(sed -n 's/^## \[\{0,1\}\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' CHANGELOG.md | head -1)
           [ "$GITHUB_REF_NAME" = "v$VERSION" ] \
             || { echo "Tag $GITHUB_REF_NAME does not match CHANGELOG version $VERSION"; exit 1; }
-
-      - name: Install LaTeX
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            texlive-latex-base texlive-latex-recommended \
-            texlive-latex-extra texlive-fonts-recommended latexmk
 
       - name: Build user guide
         run: make pdf
