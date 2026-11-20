@@ -12,9 +12,9 @@ import scala.sys.process._
 
 val coreNameLc = coreName.toLowerCase
 
-// Version comes from git, the same source as the user guide cover
+// Version comes from git, the same source as the user guide cover.
 val coreVersion: String =
-  scala.util.Try("git describe --tags --always --dirty".!!.trim)
+  scala.util.Try("git describe --tags --always".!!.trim)
     .map(_.stripPrefix("v"))
     .getOrElse("0.0.0-dev")
 

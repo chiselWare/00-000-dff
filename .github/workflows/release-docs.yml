@@ -10,10 +10,11 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    container: ghcr.io/chiselware/dev-full:0.8.0
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # full history + tags so git describe gives the tag
+          fetch-depth: 0
 
       - name: Verify certified tags
         run: |
@@ -26,26 +27,17 @@ jobs:
           [ "$GITHUB_REF_NAME" = "v$VERSION" ] \
             || { echo "Tag $GITHUB_REF_NAME does not match CHANGELOG version $VERSION"; exit 1; }
 
-      - name: Install LaTeX
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            texlive-latex-base texlive-latex-recommended \
-            texlive-latex-extra texlive-fonts-recommended latexmk
-
       - name: Build user guide
         run: make pdf
-      - name: Create release with PDF
+
+      - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            "modules/$CORE/docs/user-guide/$GUIDE.pdf" \
+          shopt -s nullglob
+          pdfs=(modules/*/docs/user-guide/*.pdf)
+          [ ${#pdfs[@]} -gt 0 ] || { echo "No user guide PDF found"; exit 1; }
+          gh release create "$GITHUB_REF_NAME" "${pdfs[@]}" \
             --title "$GITHUB_REF_NAME" \
-            --notes "chiselWare release $GITHUB_REF_NAME"
-
-      - name: Attach PDF to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: modules/${{ env.CORE }}/docs/user-guide/${{ env.GUIDE }}.pdf
-          fail_on_unmatched_files: true
+            --verify-tag \
+            --generate-notes
