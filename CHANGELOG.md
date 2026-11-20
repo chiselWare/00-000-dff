@@ -1,13 +1,4 @@
-# Changelog
-## [0.9.6] - 2026-11-18
-### Added
-- 
-### Fixed
-- 
-### Changed
-- No changes from 0.9.5, first test of feature->staging->main workflow
-
-## [0.9.5] - 2026-11-17
+## [0.9.5] - 2026-11-19
 ### Added
 - New `promote-ci` and `release-docs` workflow for promotion to main and User Guide tied to release tag
 - Automatically add version to user guide title page derived from the GitHub release tag
