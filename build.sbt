@@ -4,7 +4,7 @@ val orgId = "00"
 val teamId = "000"
 val ipfParams = "width=8"
 
-val chiselWareVersion = "0.9.5"
+val chiselWareVersion = "0.10.0"
 val spdxCopyrightText = Seq("<COPYRIGHT HOLDER>") // add as many as needed
 //════ End Core Configuration -- do not modify below this line ═════════════════
 

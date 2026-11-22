@@ -1,3 +1,10 @@
+## [0.10.0] - 2026-11-21
+### Added
+- Align with chiselWare 0.10.0 updates
+### Fixed
+- 
+### Changed
+- 
 ## [0.9.5] - 2026-11-19
 ### Added
 - New `promote-ci` and `release-docs` workflow for promotion to main and User Guide tied to release tag
