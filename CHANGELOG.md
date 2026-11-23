@@ -1,3 +1,20 @@
+# CHANGELOG.md
+## [0.10.1] - 2026-11-21
+### Added
+- 
+### Fixed
+- 
+### Changed
+- release-docs.yaml updated to use SSE container 0.10.1
+
+## [0.10.0] - 2026-11-21
+### Added
+- 
+### Fixed
+- 
+### Changed
+- Aligned with chiselWare 0.10.0
+
 ## [0.9.5] - 2026-11-19
 ### Added
 - New `promote-ci` and `release-docs` workflow for promotion to main and User Guide tied to release tag
