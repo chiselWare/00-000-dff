@@ -10,9 +10,10 @@ project/*
 *.rpt
 .ipf/*
 !.ipf/*.json
-!.ipf/*.pdf
 .ipf/*.anno.json
 .firefox-profiles/
+modules/*/docs/user-guide/*.pdf
+modules/*/docs/user-guide/version.tex
 
 # Visual Studio
 .vscode
