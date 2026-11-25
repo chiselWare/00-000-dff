@@ -1,5 +1,13 @@
 # CHANGELOG.md
-## [0.10.1] - 2026-11-21
+## [0.10.2] - 2026-11-23
+### Added
+- Add release into the ci-promotion workflow
+### Fixed
+- 
+### Changed
+- Stop tracking generated PDFs and version.tex so that `make all` doesn't dirty an unmodified repo
+
+## [0.10.1] - 2026-11-22
 ### Added
 - 
 ### Fixed
