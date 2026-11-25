@@ -1,7 +1,13 @@
-name: "promotion check"
+name: "promotion"
+
+# pull_request into main: check that the promotion is valid (staging only, new version).
+# push to main (the merged promotion): tag the release; the tag push runs
+# release-docs.yml, which publishes it.
 
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
 
 permissions:
@@ -9,9 +15,59 @@ permissions:
 
 jobs:
   source-check:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Require staging as source
         run: |
           [ "$GITHUB_HEAD_REF" = "staging" ] \
             || { echo "Only staging may be promoted to main"; exit 1; }
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags
+
+      - name: Require a new release version
+        run: |
+          VERSION=$(sed -n 's/^## \[\{0,1\}\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' CHANGELOG.md | head -1)
+          [ -n "$VERSION" ] || { echo "No version found in CHANGELOG.md"; exit 1; }
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "v$VERSION already exists: add a new version to CHANGELOG.md before promoting"
+            exit 1
+          fi
+          echo "Merging this promotion will release v$VERSION"
+
+  # The tag is pushed with the chiselWare release App's token: the App is on the
+  # release-tag ruleset's bypass list, and (unlike GITHUB_TOKEN) its tag push
+  # triggers release-docs.yml, which builds and publishes the release.
+  tag:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get release App token
+        id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags
+          token: ${{ steps.app.outputs.token }}
+
+      - name: Tag the release
+        id: tag
+        run: |
+          VERSION=$(sed -n 's/^## \[\{0,1\}\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/p' CHANGELOG.md | head -1)
+          [ -n "$VERSION" ] || { echo "No version found in CHANGELOG.md"; exit 1; }
+          TAG="v$VERSION"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "$TAG already exists: nothing to release"
+            exit 0
+          fi
+          git config user.name "${{ steps.app.outputs.app-slug }}[bot]"
+          git config user.email "${{ steps.app.outputs.app-slug }}[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "${GITHUB_REPOSITORY#*/} $TAG" "$GITHUB_SHA"
+          git push origin "refs/tags/$TAG"
+          echo "Tagged $TAG; release-docs.yml will publish the release"
